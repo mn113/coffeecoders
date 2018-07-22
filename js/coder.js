@@ -81,3 +81,10 @@ class Coder {
         if (Math.random() > 0.8) this.wantSugar();
     }
 }
+
+// make 4 coders:
+var n = 4;
+var coders = [];
+for (var i = 0; i < n; i++) {
+    coders.push(new Coder());
+}

@@ -38,16 +38,44 @@ var coderPositions = [
     {x:327, y:123}
 ];
 
-for (let i = 0; i < coderPositions.length; i++) {
-    let p = coderPositions[i];
-    console.log(p);
+// Render coders:
+for (var i = 0; i < coders.length; i++) {
+    let pos = coderPositions[i];
+    renderCoder(pos);
+    renderLabel(pos, coders[i].name);
+    renderTag(pos, '☕');
+}
+
+// Add delegated hover event listeners to coders:
+fgLayer.on('mouseover', function(evt) {
+    var shape = evt.target;
+    if (shape.className == 'Image') {
+        document.body.style.cursor = 'pointer';
+        shape.scaleX(1.2);
+        shape.scaleY(1.2);
+        console.log(shape);
+        fgLayer.draw();
+    }
+});
+fgLayer.on('mouseout', function(evt) {
+    var shape = evt.target;
+    if (shape.className == 'Image') {
+        document.body.style.cursor = 'default';
+        shape.scaleX(1);
+        shape.scaleY(1);
+        fgLayer.draw();
+    }
+});
+
+function renderCoder(pos) {
+    console.log(pos);
     let imageObj = new Image();
-    imageObj.src = `https://avatars.dicebear.com/v2/male/coder.${p.x}.${p.y}.svg`;
+    imageObj.src = `https://avatars.dicebear.com/v2/male/coder.${pos.x}.${pos.y}.svg`;
     imageObj.onload = function() {
-        var coderImg = new Konva.Image({
+        let coderImg = new Konva.Image({
             image: imageObj,
-            x: p.x,
-            y: p.y,
+            x: pos.x,
+            y: pos.y,
             width: 24,
             height: 24,
             offset: {
@@ -55,30 +83,69 @@ for (let i = 0; i < coderPositions.length; i++) {
                 y: 12
             }
         });
-        //coderImg.image(imageObj);
         fgLayer.add(coderImg);
         fgLayer.draw();
-        console.log(`Loaded coderImg ${i} @ ${p.x},${p.y}`);
+        console.log(`Loaded coderImg @ ${pos.x},${pos.y}`);
     };
 }
 
-// use event delegation to update pointer style
-fgLayer.on('mouseover', function(evt) {
-    var shape = evt.target;
-    document.body.style.cursor = 'pointer';
-    shape.scaleX(1.2);
-    shape.scaleY(1.2);
-    console.log(shape);
-    fgLayer.draw();
-});
-fgLayer.on('mouseout', function(evt) {
-    var shape = evt.target;
-    document.body.style.cursor = 'default';
-    shape.scaleX(1);
-    shape.scaleY(1);
-    fgLayer.draw();
-});
 
+function renderLabel(pos, content) {
+    // create label
+    var coderLabel = new Konva.Label({
+        x: pos.x - 30,
+        y: pos.y - 30,
+        //visible: false
+    });
+    
+    // add text to the label
+    coderLabel.add(new Konva.Text({
+        text: content,
+        fontSize: 10,
+        padding: 2,
+        fill: '#c0ffee',
+        stroke: 'black',
+        strokeWidth: 0.1
+    }));
+
+    fgLayer.add(coderLabel);
+}
+
+
+function renderTag(pos, content) {
+    // create label
+    var tagLabel = new Konva.Label({
+        x: pos.x + 12,
+        y: pos.y
+    });
+    
+    // add a tag to the label
+    tagLabel.add(new Konva.Tag({
+        fill: '#eee',
+        stroke: '#333',
+        strokeWidth: 1,
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: [10, 10],
+        shadowOpacity: 0.2,
+        lineJoin: 'round',
+        pointerDirection: 'left',
+        pointerWidth: 5,
+        pointerHeight: 5,
+        cornerRadius: 3
+    }));
+    
+    // add text to the label
+    tagLabel.add(new Konva.Text({
+        text: content,
+        fontSize: 10,
+        padding: 2
+    }));
+
+    fgLayer.add(tagLabel);
+}
+
+const foods = ['🍩','🥐','🍪'];
 
 const GAME = {
     loc: 0,
@@ -90,12 +157,7 @@ const GAME = {
     }
 };
 
-// make 3 coders:
-var n = 1;
-var coders = [];
-for (var i = 0; i < n; i++) {
-    coders.push(new Coder());
-}
+
 // game loop:
 var t = setInterval(() => {
     for (c of coders) {
