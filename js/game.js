@@ -44,6 +44,7 @@ for (var i = 0; i < coders.length; i++) {
     renderCoder(pos);
     renderLabel(pos, coders[i].name);
     renderTag(pos, '☕');
+    renderCaffBar(pos, coders[i].caffeine);
 }
 
 // Add delegated hover event listeners to coders:
@@ -89,7 +90,6 @@ function renderCoder(pos) {
     };
 }
 
-
 function renderLabel(pos, content) {
     // create label
     var coderLabel = new Konva.Label({
@@ -101,16 +101,17 @@ function renderLabel(pos, content) {
     // add text to the label
     coderLabel.add(new Konva.Text({
         text: content,
+        fontFamily: 'monospace',
+        fontVariant: 'bold',
         fontSize: 10,
         padding: 2,
         fill: '#c0ffee',
         stroke: 'black',
-        strokeWidth: 0.1
+        strokeWidth: 0.25
     }));
 
     fgLayer.add(coderLabel);
 }
-
 
 function renderTag(pos, content) {
     // create label
@@ -143,6 +144,22 @@ function renderTag(pos, content) {
     }));
 
     fgLayer.add(tagLabel);
+}
+
+function renderCaffBar(pos, value) {
+    var caffBar = new Konva.Rect({
+        x: pos.x - 12,
+        y: pos.y + 20,
+        width: 24,
+        height: 5,
+        fillLinearGradientStartPoint: {x: 0, y: 0},
+        fillLinearGradientEndPoint: {x: 24, y: 0},
+        fillLinearGradientColorStops: [0, 'brown', value, 'brown', value, 'black', 1, 'black'],
+        stroke: 'white',
+        strokeWidth: 0.5
+    });
+
+    fgLayer.add(caffBar);
 }
 
 const foods = ['🍩','🥐','🍪'];

@@ -6,8 +6,8 @@ Array.prototype.pluck = function() {
 
 var names = {
     male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo"],
-    female: ["Aroma", "Illy", "Jo", "Flo"],
-    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Koorig", "Cupp"]
+    female: ["Aroma", "Illy", "Jo", "Flo", "Cath"],
+    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Koorig", "Macupp"]
 };
 
 class Coder {
