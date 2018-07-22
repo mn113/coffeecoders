@@ -9,87 +9,12 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #F0F0F0;
     }
   </style>
 </head>
 <body>
-  <div id="container"></div>
-  <script>
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-    
-    var stage = new Konva.Stage({
-      container: 'container',
-      width: width,
-      height: height
-    });
-
-    // Define layers:
-    var bgLayer = new Konva.Layer();
-    stage.add(bgLayer);
-    var fgLayer = new Konva.Layer();
-    stage.add(fgLayer);
-
-    // Background:
-    var bgImg = new Image();
-    bgImg.src = `img/office.png`;
-    bgImg.onload = function() {
-            //?.image(bgImg);
-            bgLayer.draw();
-        };
-    bgLayer.add(new Konva.Image({
-        x: 0,
-        y: 0,
-        image: bgImg
-    }));
-
-    var coderPositions = [
-        {x:147, y:123},
-        {x:207, y:123},
-        {x:267, y:123},
-        {x:327, y:123}
-    ];
-
-    for (var p of coderPositions) {
-        var coderImg = new Konva.Image({
-            x: p.x,
-            y: p.y,
-            width: 24,
-            height: 24,
-            offset: {
-                x: 12,
-                y: 12
-            },
-            //draggable: true
-        });
-        fgLayer.add(coderImg);
-
-        var imageObj = new Image();
-        imageObj.src = `https://avatars.dicebear.com/v2/male/coder.${p.x}.${p.y}.svg`;
-        imageObj.onload = function() {
-            coderImg.image(imageObj);
-            fgLayer.draw();
-        };
-    }
-
-    // use event delegation to update pointer style
-    fgLayer.on('mouseover', function(evt) {
-        var shape = evt.target;
-        document.body.style.cursor = 'pointer';
-        shape.scaleX(1.2);
-        shape.scaleY(1.2);
-        fgLayer.draw();
-    });
-    fgLayer.on('mouseout', function(evt) {
-        var shape = evt.target;
-        document.body.style.cursor = 'default';
-        shape.scaleX(1);
-        shape.scaleY(1);
-        fgLayer.draw();
-    });
-
-  </script>
-
+    <div id="container"></div>
+    <script src="js/coder.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
