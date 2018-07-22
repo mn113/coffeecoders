@@ -25,52 +25,68 @@
       height: height
     });
 
-    var coderPositions = [
-        {x:100, y:100},
-        {x:200, y:100},
-        {x:100, y:200},
-        {x:200, y:200}
-    ];
+    // Define layers:
+    var bgLayer = new Konva.Layer();
+    stage.add(bgLayer);
+    var fgLayer = new Konva.Layer();
+    stage.add(fgLayer);
 
-    var layer = new Konva.Layer();
-    stage.add(layer);
+    // Background:
+    var bgImg = new Image();
+    bgImg.src = `img/office.png`;
+    bgImg.onload = function() {
+            //?.image(bgImg);
+            bgLayer.draw();
+        };
+    bgLayer.add(new Konva.Image({
+        x: 0,
+        y: 0,
+        image: bgImg
+    }));
+
+    var coderPositions = [
+        {x:147, y:123},
+        {x:207, y:123},
+        {x:267, y:123},
+        {x:327, y:123}
+    ];
 
     for (var p of coderPositions) {
         var coderImg = new Konva.Image({
             x: p.x,
             y: p.y,
-            width: 100,
-            height: 100,
+            width: 24,
+            height: 24,
             offset: {
-                x: 50,
-                y: 50
+                x: 12,
+                y: 12
             },
             //draggable: true
         });
-        layer.add(coderImg);
+        fgLayer.add(coderImg);
 
         var imageObj = new Image();
         imageObj.src = `https://avatars.dicebear.com/v2/male/coder.${p.x}.${p.y}.svg`;
         imageObj.onload = function() {
             coderImg.image(imageObj);
-            layer.draw();
+            fgLayer.draw();
         };
     }
 
     // use event delegation to update pointer style
-    layer.on('mouseover', function(evt) {
+    fgLayer.on('mouseover', function(evt) {
         var shape = evt.target;
         document.body.style.cursor = 'pointer';
         shape.scaleX(1.2);
         shape.scaleY(1.2);
-        layer.draw();
+        fgLayer.draw();
     });
-    layer.on('mouseout', function(evt) {
+    fgLayer.on('mouseout', function(evt) {
         var shape = evt.target;
         document.body.style.cursor = 'default';
         shape.scaleX(1);
         shape.scaleY(1);
-        layer.draw();
+        fgLayer.draw();
     });
 
   </script>
