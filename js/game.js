@@ -1,9 +1,10 @@
 const GAME = {
+    activeTool: null,
     loc: 0,
     bugs: 0,
-    timeLeft: 5,
+    timeLeft: 10,
     target: {
-        loc: 1000,
+        loc: 1000,  // TODO: more levels
         bugs: 1000
     }
 };
@@ -40,6 +41,50 @@ bgLayer.add(new Konva.Image({
     image: bgImg
 }));
 
+// Tool Menu:
+var tools = {};
+tools.code = new Konva.Text({
+    x: 0,
+    y: 0,
+    text: 'WRITE CODE',
+    fontSize: 30,
+    stroke: "#C0FFEE"
+});
+tools.code.on('click', function() {
+    GAME.activeTool = 'code';
+    highlightMenu(1);
+});
+tools.fixbugs = new Konva.Text({
+    x: 200,
+    y: 0,
+    text: 'FIX BUGS',
+    fontSize: 30,
+    stroke: (GAME.activeTool == 'fixbugs') ? "salmon" : "#C0FFEE"
+});
+tools.fixbugs.on('click', function() {
+    GAME.activeTool = 'fixbugs';
+    highlightMenu(2);
+});
+tools.sleep = new Konva.Text({
+    x: 350,
+    y: 0,
+    text: 'SLEEP',
+    fontSize: 30,
+    stroke: (GAME.activeTool == 'sleep') ? "salmon" : "#C0FFEE"
+});
+tools.sleep.on('click', function() {
+    GAME.activeTool = 'sleep';
+    highlightMenu(3);
+});
+bgLayer.add(tools.code, tools.fixbugs, tools.sleep);
+
+// Apply colour styles to the tool menu:
+function highlightMenu(value) {
+    tools.code.stroke(value === 1 ? "salmon" : "#C0FFEE");
+    tools.fixbugs.stroke(value === 2 ? "salmon" : "#C0FFEE")
+    tools.sleep.stroke(value === 3 ? "salmon" : "#C0FFEE")
+    bgLayer.draw();
+}
 
 // Initial render of coders:
 for (var coder of coders) {
@@ -48,29 +93,8 @@ for (var coder of coders) {
     coder.renderBubble('?');
 }
 
-// Add delegated hover event listeners to coders:
-/*fgLayer.on('mouseover', function(evt) {
-    var shape = evt.target;
-    if (shape.className == 'Image') {
-        document.body.style.cursor = 'pointer';
-        shape.scaleX(1.2);
-        shape.scaleY(1.2);
-        console.log(shape);
-        // need to get this coder and show their name label
-        fgLayer.draw();
-    }
-});
-fgLayer.on('mouseout', function(evt) {
-    var shape = evt.target;
-    if (shape.className == 'Image') {
-        document.body.style.cursor = 'default';
-        shape.scaleX(1);
-        shape.scaleY(1);
-        fgLayer.draw();
-    }
-});*/
 
-
+//Code on screens...
 function renderCode(pos) {
     let imageObj = new Image();
     imageObj.src = `img/code.png`;

@@ -152,6 +152,11 @@ class Coder {
                     me.nameLabel.hide();
                     fgLayer.draw();
                 }
+            }).on('click', function() {
+                if (GAME.activeTool == 'code') me.mode = 'coding';
+                else if (GAME.activeTool == 'fixbugs') me.mode = 'debugging';
+                else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
+                highlightMenu(0);
             });
         };
     }
