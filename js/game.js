@@ -1,3 +1,13 @@
+const GAME = {
+    loc: 0,
+    bugs: 0,
+    timeLeft: 5,
+    target: {
+        loc: 1000,
+        bugs: 1000
+    }
+};
+
 // Set up Konva:
 var stage = new Konva.Stage({
     container: 'container',
@@ -30,30 +40,23 @@ bgLayer.add(new Konva.Image({
     image: bgImg
 }));
 
-var coderPositions = [
-    {x:147, y:123},
-    {x:207, y:123},
-    {x:267, y:123},
-    {x:327, y:123}
-];
 
-// Render coders:
-for (var i = 0; i < coders.length; i++) {
-    let pos = coderPositions[i];
-    renderCoder(pos);
-    renderLabel(pos, coders[i].name);
-    renderTag(pos, '☕');
-    renderCaffBar(pos, coders[i].caffeine);
+// Initial render of coders:
+for (var coder of coders) {
+    coder.render();
+    coder.renderNameLabel();
+    coder.renderBubble('?');
 }
 
 // Add delegated hover event listeners to coders:
-fgLayer.on('mouseover', function(evt) {
+/*fgLayer.on('mouseover', function(evt) {
     var shape = evt.target;
     if (shape.className == 'Image') {
         document.body.style.cursor = 'pointer';
         shape.scaleX(1.2);
         shape.scaleY(1.2);
         console.log(shape);
+        // need to get this coder and show their name label
         fgLayer.draw();
     }
 });
@@ -65,100 +68,8 @@ fgLayer.on('mouseout', function(evt) {
         shape.scaleY(1);
         fgLayer.draw();
     }
-});
+});*/
 
-function renderCoder(pos) {
-    let imageObj = new Image();
-    imageObj.src = `https://avatars.dicebear.com/v2/male/coder.${pos.x}.${pos.y}.svg`;
-    imageObj.onload = function() {
-        let coderImg = new Konva.Image({
-            image: imageObj,
-            x: pos.x,
-            y: pos.y,
-            width: 24,
-            height: 24,
-            offset: {
-                x: 12,
-                y: 12
-            }
-        });
-        fgLayer.add(coderImg);
-        fgLayer.draw();
-        console.log(`Loaded coderImg @ ${pos.x},${pos.y}`);
-    };
-}
-
-function renderLabel(pos, content) {
-    // create label
-    var coderLabel = new Konva.Label({
-        x: pos.x - 30,
-        y: pos.y - 30,
-        //visible: false
-    });
-    
-    // add text to the label
-    coderLabel.add(new Konva.Text({
-        text: content,
-        fontFamily: 'monospace',
-        fontVariant: 'bold',
-        fontSize: 10,
-        padding: 2,
-        fill: '#c0ffee',
-        stroke: 'black',
-        strokeWidth: 0.25
-    }));
-
-    fgLayer.add(coderLabel);
-}
-
-function renderTag(pos, content) {
-    // create label
-    var tagLabel = new Konva.Label({
-        x: pos.x + 12,
-        y: pos.y
-    });
-    
-    // add a tag to the label
-    tagLabel.add(new Konva.Tag({
-        fill: '#eee',
-        stroke: '#333',
-        strokeWidth: 1,
-        shadowColor: 'black',
-        shadowBlur: 10,
-        shadowOffset: [10, 10],
-        shadowOpacity: 0.2,
-        lineJoin: 'round',
-        pointerDirection: 'left',
-        pointerWidth: 5,
-        pointerHeight: 5,
-        cornerRadius: 3
-    }));
-    
-    // add text to the label
-    tagLabel.add(new Konva.Text({
-        text: content,
-        fontSize: 10,
-        padding: 2
-    }));
-
-    fgLayer.add(tagLabel);
-}
-
-function renderCaffBar(pos, value) {
-    var caffBar = new Konva.Rect({
-        x: pos.x - 12,
-        y: pos.y + 20,
-        width: 24,
-        height: 5,
-        fillLinearGradientStartPoint: {x: 0, y: 0},
-        fillLinearGradientEndPoint: {x: 24, y: 0},
-        fillLinearGradientColorStops: [0, 'brown', value, 'brown', value, 'black', 1, 'black'],
-        stroke: 'white',
-        strokeWidth: 0.5
-    });
-
-    fgLayer.add(caffBar);
-}
 
 function renderCode(pos) {
     let imageObj = new Image();
@@ -208,20 +119,6 @@ screenGroup.add(blackScreen);
 screenGroup.add(text);
 screensLayer.add(screenGroup);
 screensLayer.draw();
-
-
-
-const foods = ['🍩','🥐','🍪'];
-
-const GAME = {
-    loc: 0,
-    bugs: 0,
-    timeLeft: 5,
-    target: {
-        loc: 1000,
-        bugs: 1000
-    }
-};
 
 
 // game loop:
