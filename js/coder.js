@@ -15,14 +15,16 @@ const names = {   // need 12 of each
     last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Q. Rigg", "Macupp"]
 };
 
+const modes = ['💤']
+
 const coffees = [
-    {name: 'Espresso', img: ''},
-    {name: 'Double Espresso', img: ''},
-    {name: 'Latte', img: ''},
-    {name: 'Cappuccino', img: ''},
-    {name: 'Mocha', img: ''},
-    {name: 'Americano', img: ''},
-    {name: 'Iced Coffee', img: ''},
+    {name: 'Americano', strength: 0.8, img: ''},
+    {name: 'Latte', strength: 0.9, img: ''},
+    {name: 'Cappuccino', strength: 1, img: ''},
+    {name: 'Espresso', strength: 1, img: ''},
+    {name: 'Mocha', strength: 1.3, img: ''},
+    {name: 'Iced Coffee', strength: 1.5, img: ''},
+    {name: 'Double Espresso', strength: 2, img: ''}
 ];
 
 const foods = [
@@ -33,15 +35,17 @@ const foods = [
 
 class Coder {
     constructor(pos) {
+        this.pos = pos;
         this.sex = (Math.random() > 0.5) ? 'male' : 'female';
         this.name = this.makeName(this.sex);
         this.imgUrl = `https://avatars.dicebear.com/v2/${this.sex}/${this.name}.svg`;
+        this.mode = 'coding';
         this.caffeine = 0.3 + Math.random() * 0.4;
         this.tolerance = 0.3 + Math.random() * 0.4;
         this.falloff = 0.3 + Math.random() * 0.4;
-        this.coffeePreference = Math.floor(Math.random() * 7);
-        this.mode = 'coding';
-        this.pos = pos;
+        this.coffeePreference = Math.floor(Math.random() * 7);  // index of coffees
+        this.craving = null; // can be a coffee or a food
+        this.toDrink = 0; // empty cup
     }
 
     toString() {
@@ -55,12 +59,6 @@ class Coder {
 
     makeName(sex) {
         return names[sex].pluck() + ' ' + names['last'].pluck();
-    }
-
-    addCoffee(strength) {
-        this.caffeine += strength / 10;
-        this.caffeine = Math.min(1, this.caffeine);
-        this.tolerance += 0.03;
     }
 
     writeCode() {
@@ -79,12 +77,38 @@ class Coder {
         this.sleepNeeded--;
     }
 
+    wantCoffee() {
+        var coffee = coffees[this.coffeePreference];
+        this.craving = coffee;
+        this.renderBubble(this.coffeePreference);
+        this.bubble.show();
+        console.log(`${this.name} wants a ${coffee.name}`);
+    }
+
     wantSugar() {
         var treat = foods.random();
-        console.log(`${this.name} wants a ${treat.name}`);
+        this.craving = treat;
         this.renderBubble(treat.icon);
         this.bubble.show();
-        // TODO: time it out
+        console.log(`${this.name} wants a ${treat.name}`);
+        // Time it out:
+        setTimeout(() => {
+            this.craving = null;
+            this.bubble.hide();
+        }, 3000 + 1000 * Math.random());
+    }
+
+    // Inject coffee, altering coder's stats:
+    addCoffee(coffee) {
+        this.caffeine += coffee.strength / 10;
+        this.caffeine = Math.min(1, this.caffeine);
+        this.tolerance += 0.03;
+        this.falloff -= 0.03;
+        // TODO: render cup on desk?
+        this.toDrink = coffee.strength;
+        setTimeout(() => {
+            this.craving = null;
+        }, 1000 * coffee.strength);
     }
 
     // Render the coder's face (run once):
@@ -211,10 +235,12 @@ class Coder {
 
     // Update the coder's stats & re-render stuff on every game tick:
     tick() {
+        // TODO: if sleeping, return early
+
         switch (this.mode) {
             case 'coding':
                 this.writeCode();
-                this.writeBugs();    
+                this.writeBugs();
                 break;
             
             case 'debugging':
@@ -225,11 +251,17 @@ class Coder {
                 this.sleep();
                 break;
         }
+        // Use up available coffee:
+        this.toDrink -= 0.2;    // sips 1/5 of an Espresso per tick
+        this.toDrink = Math.max(0, this.toDrink);
         this.caffeine -= 0.1 * this.falloff; // make geometric?
         this.caffeine = Math.max(0, this.caffeine);
         this.renderCaffBar(this.caffeine);
 
-        if (Math.random() > 0.8) this.wantSugar();
+        if (!this.craving) {
+            if (this.toDrink <= 0 && Math.random() > 0.9) this.wantCoffee();
+            else if (Math.random() > 0.9) this.wantSugar();
+        }
     }
 }
 
