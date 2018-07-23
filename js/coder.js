@@ -4,10 +4,10 @@ Array.prototype.pluck = function() {
     return this.splice(index, 1);
 }
 
-var names = {
+var names = {   // need 12 of each
     male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo"],
     female: ["Aroma", "Illy", "Jo", "Flo", "Cath"],
-    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Koorig", "Macupp"]
+    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Q. Rigg", "Macupp"]
 };
 
 class Coder {
