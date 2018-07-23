@@ -18,13 +18,13 @@ const names = {   // need 12 of each
 const modes = ['💤']
 
 const coffees = [
-    {name: 'Americano', strength: 0.8, img: ''},
-    {name: 'Latte', strength: 0.9, img: ''},
-    {name: 'Cappuccino', strength: 1, img: ''},
-    {name: 'Espresso', strength: 1, img: ''},
-    {name: 'Mocha', strength: 1.3, img: ''},
-    {name: 'Iced Coffee', strength: 1.5, img: ''},
-    {name: 'Double Espresso', strength: 2, img: ''}
+    {name: 'Americano', strength: 0.8, img: 'img/americano.svg', imgObj: null},
+    {name: 'Latte', strength: 0.9, img: 'img/latte.svg', imgObj: null},
+    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.svg', imgObj: null},
+    {name: 'Espresso', strength: 1, img: 'img/espresso.svg', imgObj: null},
+    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.svg', imgObj: null},
+    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.svg', imgObj: null},
+    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.svg', imgObj: null}
 ];
 
 const foods = [
@@ -57,6 +57,7 @@ class Coder {
         console.log(this.toString());        
     }
 
+    // Generate a first and last name for this coder:
     makeName(sex) {
         return names[sex].pluck() + ' ' + names['last'].pluck();
     }
@@ -114,10 +115,10 @@ class Coder {
     // Render the coder's face (run once):
     render() {
         var me = this;
-        var imageObj = new Image();
+        var imageObj = new Image(24,24);
         imageObj.src = `https://avatars.dicebear.com/v2/${this.sex}/${this.name}.svg`;
         imageObj.onload = function() {
-            var coderImg = new Konva.Image({
+            me.coderImg = new Konva.Image({
                 image: imageObj,
                 x: me.pos.x,
                 y: me.pos.y,
@@ -128,37 +129,61 @@ class Coder {
                     y: 12
                 }
             });
-            fgLayer.add(coderImg);
+            fgLayer.add(me.coderImg);
             fgLayer.draw();
             console.log(`Loaded coder ${me.name} img @ ${me.pos.x},${me.pos.y}`);
-
-            // Bind event listeners to the image:
-            coderImg.on('mouseover', function(evt) {
-                var shape = evt.target;
-                if (shape.className == 'Image') {
-                    document.body.style.cursor = 'pointer';
-                    shape.scaleX(1.2);
-                    shape.scaleY(1.2);
-                    console.log(shape, me);
-                    me.nameLabel.show();
-                    fgLayer.draw();
-                }
-            }).on('mouseout', function(evt) {
-                var shape = evt.target;
-                if (shape.className == 'Image') {
-                    document.body.style.cursor = 'default';
-                    shape.scaleX(1);
-                    shape.scaleY(1);
-                    me.nameLabel.hide();
-                    fgLayer.draw();
-                }
-            }).on('click', function() {
-                if (GAME.activeTool == 'code') me.mode = 'coding';
-                else if (GAME.activeTool == 'fixbugs') me.mode = 'debugging';
-                else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
-                highlightMenu(0);
-            });
+            me.wireUp();
         };
+    }
+    
+    // Bind event listeners to the coder's image:
+    wireUp() {
+        var me = this;
+        this.coderImg.on('mouseover', function(evt) {
+            var shape = evt.target;
+            if (shape.className == 'Image') {
+                document.body.style.cursor = 'pointer';
+                shape.scaleX(1.2);
+                shape.scaleY(1.2);
+                console.log(shape, me);
+                me.nameLabel.show();
+                fgLayer.draw();
+            }
+        }).on('mouseout', function(evt) {
+            var shape = evt.target;
+            if (shape.className == 'Image') {
+                document.body.style.cursor = 'default';
+                shape.scaleX(1);
+                shape.scaleY(1);
+                me.nameLabel.hide();
+                fgLayer.draw();
+            }
+        }).on('click', function() {
+            if (GAME.activeTool == 'code') me.mode = 'coding';
+            else if (GAME.activeTool == 'fixbugs') me.mode = 'fixing';
+            else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
+            me.renderModeIndicator();
+            highlightMenu(0);
+        });
+    }
+
+    // Display coder's mode indicator (C|F|S):
+    renderModeIndicator() {
+        this.modeIndicator = new Konva.Text({
+            x: this.pos.x - 22,
+            y: this.pos.y + 16,
+            text: this.mode.charAt(0).toUpperCase(),
+            fontVariant: 'bold',
+            fontSize: 10,
+            fill: '#c0ffee',
+            stroke: 'black',
+            strokeWidth: 0.25
+        });
+
+        //TODO: clear existing Text
+
+        fgLayer.add(this.modeIndicator);
+        fgLayer.draw();
     }
     
     // Add a name label above the coder (run once):
@@ -248,7 +273,7 @@ class Coder {
                 this.writeBugs();
                 break;
             
-            case 'debugging':
+            case 'fixing':
                 this.fixBugs();
                 break;
 

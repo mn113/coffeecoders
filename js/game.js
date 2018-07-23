@@ -29,7 +29,7 @@ stage.add(screensLayer);
 
 // Background:
 var bgImg = new Image();
-bgImg.src = `img/office.png`;
+bgImg.src = `img/office.svg`;
 bgImg.onload = function() {
     bgLayer.draw();
 };
@@ -55,7 +55,7 @@ tools.code.on('click', function() {
     highlightMenu(1);
 });
 tools.fixbugs = new Konva.Text({
-    x: 200,
+    x: 215,
     y: 0,
     text: 'FIX BUGS',
     fontSize: 30,
@@ -66,7 +66,7 @@ tools.fixbugs.on('click', function() {
     highlightMenu(2);
 });
 tools.sleep = new Konva.Text({
-    x: 350,
+    x: 380,
     y: 0,
     text: 'SLEEP',
     fontSize: 30,
@@ -81,16 +81,36 @@ bgLayer.add(tools.code, tools.fixbugs, tools.sleep);
 // Apply colour styles to the tool menu:
 function highlightMenu(value) {
     tools.code.stroke(value === 1 ? "salmon" : "#C0FFEE");
-    tools.fixbugs.stroke(value === 2 ? "salmon" : "#C0FFEE")
-    tools.sleep.stroke(value === 3 ? "salmon" : "#C0FFEE")
+    tools.fixbugs.stroke(value === 2 ? "salmon" : "#C0FFEE");
+    tools.sleep.stroke(value === 3 ? "salmon" : "#C0FFEE");
     bgLayer.draw();
 }
+
+// Load the 7 coffee images:
+function loadCoffees() {
+    for (let i = 0; i < coffees.length; i++) {
+        console.log(coffees[i]);
+        coffees[i].imgObj = new Image(24,24);
+        coffees[i].imgObj.src = coffees[i].img;
+        coffees[i].imgObj.onload = function() {
+            let coffeeImg = new Konva.Image({
+                image: coffees[i].imgObj,
+                x: 90 + Math.random() * 50,
+                y: 70 + Math.random() * 50
+            });
+            fgLayer.add(coffeeImg);
+        };
+    }
+    fgLayer.draw();
+}
+loadCoffees();
 
 // Initial render of coders:
 for (var coder of coders) {
     coder.render();
     coder.renderNameLabel();
     coder.renderBubble('?');
+    coder.renderModeIndicator();
 }
 
 
@@ -114,7 +134,7 @@ function renderCode(pos) {
         });
         screensLayer.add(locsImg);
         screensLayer.draw();
-    }
+    };
 }
 //renderCode(coderPositions[0]);
 
