@@ -102,14 +102,16 @@ fgLayer.add(coffeeMachine);
 
 // Load the 7 coffee images:
 var coffeeOrigin = {x: 100, y: 70};
-var coffeeGroup = new Konva.Group();
+var coffeeGroup = new Konva.Group({
+    visible: false
+});
 function loadCoffees() {
     for (let i = 0; i < coffees.length; i++) {
         console.log(coffees[i]);
         let img = new Image(24,24);
         img.src = coffees[i].img;
         img.onload = function() {
-            coffees[i].imgObj = new Konva.Image({
+            var imgObj = new Konva.Image({
                 image: img,
                 x: coffeeOrigin.x,
                 y: coffeeOrigin.y,
@@ -117,9 +119,26 @@ function loadCoffees() {
                     x: 12,
                     y: 12
                 },
-                visible: true   // start false
+                opacity: 0
             });
-            coffeeGroup.add(coffees[i].imgObj);
+            // Interactivity:
+            imgObj.on('mouseover', function() {
+                this.cache();
+                this.filters([Konva.Filters.Invert]);
+                fgLayer.draw();
+            })
+            .on('mouseout', function() {
+                this.cache();
+                this.filters([]);
+                fgLayer.draw();
+            })
+            .on('click', function() {
+                brewCoffee(i);
+                closeCoffeeMenu();
+            });
+            coffeeGroup.add(imgObj);
+            // Store for later:
+            coffees[i].imgObj = imgObj;
         };
     }
     fgLayer.add(coffeeGroup);
@@ -151,12 +170,35 @@ function openCoffeeMenu() {
             node: coffees[i].imgObj,
             x: positions[i].x,
             y: positions[i].y,
+            opacity: 1,
             duration: 1,
             easing: Konva.Easings.EaseOut
         });
         tween.play();
     }
     fgLayer.draw();
+}
+
+function closeCoffeeMenu() {
+    for (var i = 0; i < coffees.length; i++) {
+        let tween = new Konva.Tween({
+            node: coffees[i].imgObj,
+            x: coffeeOrigin.x,
+            y: coffeeOrigin.y,
+            opacity: 0,
+            duration: 1,
+            easing: Konva.Easings.EaseOut
+        });
+        tween.play();
+    }
+    fgLayer.draw();
+}
+
+function brewCoffee(index) {
+    console.log("Selected", coffees[index].name);
+    // Block menu
+    // Play animation
+    // Add coffee Image, draggable
 }
 
 // Initial render of coders:
