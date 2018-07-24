@@ -2,7 +2,7 @@ const GAME = {
     activeTool: null,
     loc: 0,
     bugs: 0,
-    timeLeft: 10,
+    timeLeft: 3,
     target: {
         loc: 1000,  // TODO: more levels
         bugs: 1000
@@ -86,24 +86,78 @@ function highlightMenu(value) {
     bgLayer.draw();
 }
 
+// Coffee machine hit region:
+var coffeeMachine = new Konva.Rect({
+    x: 84,
+    y: 64,
+    width: 24,
+    height: 36,
+    fill: 'yellow',
+    opacity: 0.5
+});
+coffeeMachine.on('click', function() {
+    openCoffeeMenu();
+});
+fgLayer.add(coffeeMachine);
+
 // Load the 7 coffee images:
+var coffeeOrigin = {x: 100, y: 70};
+var coffeeGroup = new Konva.Group();
 function loadCoffees() {
     for (let i = 0; i < coffees.length; i++) {
         console.log(coffees[i]);
-        coffees[i].imgObj = new Image(24,24);
-        coffees[i].imgObj.src = coffees[i].img;
-        coffees[i].imgObj.onload = function() {
-            let coffeeImg = new Konva.Image({
-                image: coffees[i].imgObj,
-                x: 90 + Math.random() * 50,
-                y: 70 + Math.random() * 50
+        let img = new Image(24,24);
+        img.src = coffees[i].img;
+        img.onload = function() {
+            coffees[i].imgObj = new Konva.Image({
+                image: img,
+                x: coffeeOrigin.x,
+                y: coffeeOrigin.y,
+                offset: {
+                    x: 12,
+                    y: 12
+                },
+                visible: true   // start false
             });
-            fgLayer.add(coffeeImg);
+            coffeeGroup.add(coffees[i].imgObj);
         };
     }
+    fgLayer.add(coffeeGroup);
     fgLayer.draw();
 }
 loadCoffees();
+
+// Calculate positions of objects around a ring:
+function ringPos(centre, total, radius) {
+    var positions = [];
+    var theta = 2 * Math.PI / total;
+    for (var i = 0; i < total; i++) {
+        positions.push({
+            x: centre.x + radius * Math.cos(i * theta),
+            y: centre.y + radius * Math.sin(i * theta)
+        });
+    }
+    return positions;
+}
+
+// Animate coffee icons into a ring:
+function openCoffeeMenu() {
+    var positions = ringPos(coffeeOrigin, coffees.length, 20);
+    console.log('positions', positions);
+    coffeeGroup.show();
+    for (var i = 0; i < coffees.length; i++) {
+        //coffees[i].imgObj.position(positions[i]);
+        let tween = new Konva.Tween({
+            node: coffees[i].imgObj,
+            x: positions[i].x,
+            y: positions[i].y,
+            duration: 1,
+            easing: Konva.Easings.EaseOut
+        });
+        tween.play();
+    }
+    fgLayer.draw();
+}
 
 // Initial render of coders:
 for (var coder of coders) {
@@ -112,7 +166,6 @@ for (var coder of coders) {
     coder.renderBubble('?');
     coder.renderModeIndicator();
 }
-
 
 //Code on screens...
 function renderCode(pos) {
