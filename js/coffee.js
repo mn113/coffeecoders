@@ -1,5 +1,6 @@
 var coffeeMenuOrigin = {x: 95, y: 70};
 var coffeeBrewOrigin = {x: 95, y: 88};
+var activeCoffee = null;
 
 // Load a coffee sprite, either for the menu system or for dragging to coders:
 function loadCoffee(index, isMenu = false) {
@@ -8,6 +9,7 @@ function loadCoffee(index, isMenu = false) {
     img.onload = function() {
         var coffeeObj = new Konva.Image({
             image: img,
+            name: coffees[index].name,
             x: coffeeMenuOrigin.x,
             y: coffeeMenuOrigin.y,
             offset: {
@@ -38,7 +40,11 @@ function loadCoffee(index, isMenu = false) {
         else {
             coffeeObj.x(coffeeBrewOrigin.x);
             coffeeObj.y(coffeeBrewOrigin.y);
-            coffeeObj.draggable();
+            coffeeObj.draggable(true);
+            coffeeObj
+            .on('dragstart', function() {
+                activeCoffee = coffeeObj;
+            });
         }
         coffeeLayer.add(coffeeObj);
         coffeeLayer.draw();

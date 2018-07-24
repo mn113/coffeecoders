@@ -11,8 +11,9 @@ Array.prototype.pluck = function() {
 
 const names = {   // need 12 of each
     male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo"],
-    female: ["Aroma", "Illy", "Jo", "Flo", "Cath"],
-    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Bean", "Nero", "Stahbux", "Q. Rigg", "Macupp"]
+    female: ["Aroma", "Illy", "Jo", "Flo", "Cath", "Maureen"],
+    last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Stahbux", "Bean", "Nero",
+            "Q. Rigg", "Macupp", "Black", "Press", "Robusta", "DiCaff"]
 };
 
 const modes = ['💤']
@@ -37,29 +38,27 @@ class Coder {
     constructor(pos) {
         this.pos = pos;
         this.sex = (Math.random() > 0.5) ? 'male' : 'female';
-        this.name = this.makeName(this.sex);
-        this.imgUrl = `https://avatars.dicebear.com/v2/${this.sex}/${this.name}.svg`;
+        this.fname = names[this.sex].pluck();
+        this.lname = names['last'].pluck();
+        //this.imgUrl = `https://avatars.dicebear.com/v2/${this.sex}/${this.fname}.svg`;    // CROSS-ORIGIN
+        this.imgUrl = `img/avatars/${this.sex}/${this.fname}.svg`;
         this.mode = 'coding';
         this.caffeine = 0.3 + Math.random() * 0.4;
         this.tolerance = 0.3 + Math.random() * 0.4;
         this.falloff = 0.3 + Math.random() * 0.4;
         this.coffeePreference = Math.floor(Math.random() * 7);  // index of coffees
-        this.craving = null; // can be a coffee or a food
-        this.toDrink = 0; // empty cup
+        this.craving = null;    // can be a coffee or a food
+        this.toDrink = 0;       // empty cup
+        this.konvaImg = null;   // Konva shape
     }
 
     toString() {
-        return `${this.name} @ (${this.pos.x},${this.pos.y}):
+        return `${this.fname} @ (${this.pos.x},${this.pos.y}):
                 caf=${this.caffeine}, tol=${this.tolerance}, fal=${this.falloff}, mode=${this.mode}`;
     }
 
     log() {
         console.log(this.toString());        
-    }
-
-    // Generate a first and last name for this coder:
-    makeName(sex) {
-        return names[sex].pluck() + ' ' + names['last'].pluck();
     }
 
     writeCode() {
@@ -83,7 +82,7 @@ class Coder {
         this.craving = coffee;
         this.renderBubble(this.coffeePreference);
         this.bubble.show();
-        console.log(`${this.name} wants a ${coffee.name}`);
+        console.log(`${this.fname} wants a ${coffee.name}`);
     }
 
     wantSugar() {
@@ -91,7 +90,7 @@ class Coder {
         this.craving = treat;
         this.renderBubble(treat.icon);
         this.bubble.show();
-        console.log(`${this.name} wants a ${treat.name}`);
+        console.log(`${this.fname} wants a ${treat.name}`);
         // Time it out:
         setTimeout(() => {
             this.craving = null;
@@ -116,9 +115,9 @@ class Coder {
     render() {
         var me = this;
         var imageObj = new Image(24,24);
-        imageObj.src = `https://avatars.dicebear.com/v2/${this.sex}/${this.name}.svg`;
+        imageObj.src = me.imgUrl;
         imageObj.onload = function() {
-            me.coderImg = new Konva.Image({
+            me.konvaImg = new Konva.Image({
                 image: imageObj,
                 x: me.pos.x,
                 y: me.pos.y,
@@ -129,9 +128,9 @@ class Coder {
                     y: 12
                 }
             });
-            fgLayer.add(me.coderImg);
+            fgLayer.add(me.konvaImg);
             fgLayer.draw();
-            console.log(`Loaded coder ${me.name} img @ ${me.pos.x},${me.pos.y}`);
+            console.log(`Loaded coder ${me.fname} img @ ${me.pos.x},${me.pos.y}`);
             me.wireUp();
         };
     }
@@ -139,7 +138,7 @@ class Coder {
     // Bind event listeners to the coder's image:
     wireUp() {
         var me = this;
-        this.coderImg.on('mouseover', function(evt) {
+        me.konvaImg.on('mouseover', function(evt) {
             var shape = evt.target;
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'pointer';
@@ -164,7 +163,35 @@ class Coder {
             else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
             me.renderModeIndicator();
             highlightMenu(0);
+        })
+        .on('dragenter', function() {
+            me.highlight();
+        })
+        .on('dragleave', function() {
+            me.unhighlight();
+        })
+        .on('drop', function() {
+            console.log(`Dropped ${activeCoffee.name} on ${me.fname}`);
+            me.addCoffee(activeCoffee);
+            // Destroy coffee
+            activeCoffee.destroy();
+            activeCoffee = null;
         });
+    }
+
+    // Lighten image:
+    highlight() {
+        this.konvaImg.cache();
+        this.konvaImg.filters([Konva.Filters.Brighten]);
+        this.konvaImg.brightness(0.2);
+        fgLayer.draw();
+    }
+
+    // Reset image lightness:
+    unhighlight() {
+        this.konvaImg.cache();
+        this.konvaImg.filters([]);
+        fgLayer.draw();
     }
 
     // Display coder's mode indicator (C|F|S):
@@ -197,7 +224,7 @@ class Coder {
         
         // add text to the label
         this.nameLabel.add(new Konva.Text({
-            text: this.name,
+            text: this.fname + ' ' + this.lname,
             fontFamily: 'monospace',
             fontVariant: 'bold',
             fontSize: 10,
@@ -254,7 +281,7 @@ class Coder {
             height: 5,
             fillLinearGradientStartPoint: {x: 0, y: 0},
             fillLinearGradientEndPoint: {x: 24, y: 0},
-            fillLinearGradientColorStops: [0, 'brown', value, 'brown', value, 'black', 1, 'black'],
+            fillLinearGradientColorStops: [0, 'chocolate', value, 'chocolate', value, 'black', 1, 'black'],
             stroke: 'white',
             strokeWidth: 0.5
         });
@@ -284,10 +311,11 @@ class Coder {
         // Use up available coffee:
         this.toDrink -= 0.2;    // sips 1/5 of an Espresso per tick
         this.toDrink = Math.max(0, this.toDrink);
-        this.caffeine -= 0.1 * this.falloff; // make geometric?
+        this.caffeine -= 0.02 * this.falloff; // make geometric?
         this.caffeine = Math.max(0, this.caffeine);
         this.renderCaffBar(this.caffeine);
 
+        // Initialise new food/drink craving?
         if (!this.craving) {
             if (this.toDrink <= 0 && Math.random() > 0.9) this.wantCoffee();
             else if (Math.random() > 0.9) this.wantSugar();
@@ -300,11 +328,19 @@ var coderPositions = [
     {x:147, y:123},
     {x:207, y:123},
     {x:267, y:123},
-    {x:327, y:123}
+    {x:327, y:123},
+    {x:147, y:173},
+    {x:207, y:173},
+    {x:267, y:173},
+    {x:327, y:173},
+    {x:147, y:223},
+    {x:207, y:223},
+    {x:267, y:223},
+    {x:327, y:223}
 ];
 
-// make 4 coders:
-var n = 4;
+// make 12 coders:
+var n = 12;
 var coders = [];
 for (var i = 0; i < n; i++) {
     coders.push(new Coder(coderPositions[i]));
