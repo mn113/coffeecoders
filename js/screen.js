@@ -24,15 +24,6 @@ class Screen {
             strokeWidth: 0.5,
             opacity: 0.5
         });
-        this.bug = new Konva.Text({
-            width: 8,
-            height: 4,
-            text: "BUG",
-            fontSize: 2,
-            stroke: 'red',
-            strokeWidth: 0.2,
-            visible: true
-        });
         this.greenCode = new Konva.Text({
             width: 16,
             height: 32,
@@ -41,13 +32,24 @@ class Screen {
             stroke: '#00FF00',
             strokeWidth: 0.2,
         });
-        screenClipGroup.add(blackScreen, this.bug, this.greenCode);
+        this.bug = new Konva.Text({
+            width: 8,
+            height: 4,
+            text: "BUG",
+            fontSize: 2,
+            fontVariant: 'bold',
+            stroke: 'red',
+            strokeWidth: 0.2,
+            visible: true
+        });
+        screenClipGroup.add(blackScreen, this.greenCode, this.bug); // ordering makes bug appear on top of code
         screensLayer.add(screenClipGroup);
         screensLayer.draw();        
     }
 
     writeCode() {
         this.greenCode.show();
+        this.greenCode.filters([]);
         // Scroll green text by one line:
         this.greenCode.offsetY(this.greenCode.offsetY() + 2);
         // Reset before off screen:
@@ -58,27 +60,24 @@ class Screen {
     writeBug() {
         // Briefly superimpose red bug
         this.bug.x(8 * Math.random());
-        this.bug.y(12 * Math.random());
+        this.bug.y(24 * Math.random()); // off the screen half the time
         this.bug.show();
         screensLayer.draw();
-        setTimeout(function() {
-            this.bug.hide();
-            screensLayer.draw();
-        }.bind(this), 750);
     }
 
     fixBug() {
-        // Use filters to tweak hue of green text:
+        // Use filters to tweak hue of text:
         this.greenCode.show();
+        this.bug.hide();
         this.greenCode.cache();
-        this.greenCode.filters([Konva.Filters.HSL, Konva.Filters.Noise]);
-        this.greenCode.hue(this.greenCode.hue() + 180);  // keep flipping hue as time ticks by
-        this.greenCode.noise(0.5);
+        this.greenCode.filters([Konva.Filters.HSL]);
+        this.greenCode.hue(50 * GAME.timeLeft);  // keep flipping hue as time ticks by
         screensLayer.draw();
     }
 
     sleep() {
         this.greenCode.hide();
+        this.bug.hide();
         screensLayer.draw();                
     }
 }

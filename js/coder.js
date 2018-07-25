@@ -52,6 +52,8 @@ class Coder {
         this.konvaImg = null;   // Konva shape
         // Attach a new screen to each coder:
         this.screen = new Screen(pos);
+
+        this.render();
     }
 
     toString() {
@@ -137,11 +139,13 @@ class Coder {
             fgLayer.add(me.konvaImg);
             fgLayer.draw();
             console.log(`Loaded coder ${me.fname} @ ${me.pos.x},${me.pos.y}`);
+            me.renderNameLabel();
+            me.renderBubble('?');
             me.wireUp();
         };
     }
     
-    // Bind event listeners to the coder's image:
+    // Bind event listeners to the coder's image (run once):
     wireUp() {
         var me = this;
         me.konvaImg.on('mouseover', function(evt) {
@@ -149,23 +153,20 @@ class Coder {
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'pointer';
                 console.log(me);
-                me.highlight();
                 me.nameLabel.show();
-                fgLayer.draw();
+                me.highlight();
             }
         }).on('mouseout', function(evt) {
             var shape = evt.target;
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'default';
-                me.unhighlight();
                 me.nameLabel.hide();
-                fgLayer.draw();
+                me.unhighlight();
             }
         }).on('click', function() {
             if (GAME.activeTool == 'code') me.mode = 'coding';
             else if (GAME.activeTool == 'fixbugs') me.mode = 'fixing';
             else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
-            me.renderModeIndicator();
             highlightMenu(0);
         })
         .on('dragenter', function() {
@@ -183,40 +184,6 @@ class Coder {
         });
     }
 
-    // Lighten image:
-    highlight() {
-        this.konvaImg.cache();
-        this.konvaImg.filters([Konva.Filters.Brighten]);
-        this.konvaImg.brightness(0.2);
-        fgLayer.draw();
-    }
-
-    // Reset image lightness:
-    unhighlight() {
-        this.konvaImg.cache();
-        this.konvaImg.filters([]);
-        fgLayer.draw();
-    }
-
-    // Display coder's mode indicator (C|F|S):
-    renderModeIndicator() {
-        this.modeIndicator = new Konva.Text({
-            x: this.pos.x - 22,
-            y: this.pos.y + 16,
-            text: this.mode.charAt(0).toUpperCase(),
-            fontVariant: 'bold',
-            fontSize: 10,
-            fill: '#c0ffee',
-            stroke: 'black',
-            strokeWidth: 0.25
-        });
-
-        //TODO: clear existing Text
-
-        fgLayer.add(this.modeIndicator);
-        fgLayer.draw();
-    }
-    
     // Add a name label above the coder (run once):
     renderNameLabel() {
         // create label
@@ -294,6 +261,21 @@ class Coder {
         this.caffBar.draw();
     }
 
+    // Lighten image:
+    highlight() {
+        this.konvaImg.cache();
+        this.konvaImg.filters([Konva.Filters.Brighten]);
+        this.konvaImg.brightness(0.15);
+        fgLayer.draw();
+    }
+
+    // Reset image lightness:
+    unhighlight() {
+        this.konvaImg.cache();
+        this.konvaImg.filters([]);
+        fgLayer.draw();
+    }
+    
     // Update the coder's stats & re-render stuff on every game tick:
     tick() {
         // TODO: if sleeping, return early
@@ -316,7 +298,7 @@ class Coder {
         this.toDrink -= 0.2;    // sips 1/5 of an Espresso per tick
         this.toDrink = Math.max(0, this.toDrink);
         this.caffeine -= 0.02 * this.falloff; // make geometric?
-        this.caffeine = Math.max(0, this.caffeine);
+        this.caffeine = Math.max(0.1, this.caffeine);
         this.renderCaffBar(this.caffeine);
 
         // Initialise new food/drink craving?

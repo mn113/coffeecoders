@@ -1,11 +1,3 @@
-// Initial render of coders:
-for (var coder of coders) {
-    coder.render();
-    coder.renderNameLabel();
-    coder.renderBubble('?');
-    coder.renderModeIndicator();
-}
-
 loadLevel(0);
 
 // game loop:

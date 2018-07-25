@@ -64,6 +64,7 @@ bgLayer.add(new Konva.Image({
 var tools = {};
 // Tool Menu:
 function makeToolMenu() {
+    var toolNames = ['code', 'fixbugs', 'sleep'];
     tools.code = new Konva.Text({
         x: 40,
         y: 0,
@@ -71,32 +72,42 @@ function makeToolMenu() {
         fontSize: 20,
         fill: "#C0FFEE"
     });
-    tools.code.on('click', function() {
+    /*tools.code.on('click', function() {
         GAME.activeTool = 'code';
         highlightMenu(1);
-    });
+    });*/
     tools.fixbugs = new Konva.Text({
         x: 40,
         y: 20,
         text: 'FIX BUGS',
         fontSize: 16,
-        fill: (GAME.activeTool == 'fixbugs') ? "salmon" : "#C0FFEE"
+        fill: "#C0FFEE"
     });
-    tools.fixbugs.on('click', function() {
+    /*tools.fixbugs.on('click', function() {
         GAME.activeTool = 'fixbugs';
         highlightMenu(2);
-    });
+    });*/
     tools.sleep = new Konva.Text({
         x: 130,
         y: 20,
         text: 'SLEEP',
         fontSize: 16,
-        fill: (GAME.activeTool == 'sleep') ? "salmon" : "#C0FFEE"
+        fill: "#C0FFEE"
     });
-    tools.sleep.on('click', function() {
-        GAME.activeTool = 'sleep';
-        highlightMenu(3);
-    });
+    // Tool behaviours:
+    for (let i = 0; i < 3; i++) {
+        tools[toolNames[i]]
+        .on('click', function() {
+            GAME.activeTool = toolNames[i];
+            highlightMenu(i+1);
+        })
+        .on('mouseover', function() {
+            document.body.style.cursor = 'pointer';
+        })
+        .on('mouseout', function() {
+            document.body.style.cursor = 'default';
+        });
+    }
     menuLayer.add(tools.code, tools.fixbugs, tools.sleep);
     menuLayer.draw();
 }
@@ -138,6 +149,7 @@ var scores = {
         x: 210,
         y: 0,
         fontSize: 45,
+        fontVariant: 'bold',
         fill: 'yellow',
         stroke: 'black',
         strokeWidth: 1,
@@ -172,7 +184,7 @@ scoreLayer.add(...Object.values(scores));
 
 function updateScores() {
     // Update clock:
-    var time = Math.ceil(GAME.timeLeft);
+    var time = Math.floor(GAME.timeLeft);
     if (time < 10) time = '0' + time;
     scores.timerText.text(time);
     // Update loc/bugs:
