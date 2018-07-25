@@ -18,22 +18,6 @@ const names = {   // need 12 of each
 
 const modes = ['💤']
 
-const coffees = [
-    {name: 'Americano', strength: 0.8, img: 'img/americano.svg', imgObj: null},
-    {name: 'Latte', strength: 0.9, img: 'img/latte.svg', imgObj: null},
-    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.svg', imgObj: null},
-    {name: 'Espresso', strength: 1, img: 'img/espresso.svg', imgObj: null},
-    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.svg', imgObj: null},
-    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.svg', imgObj: null},
-    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.svg', imgObj: null}
-];
-
-const foods = [
-    {name: 'Donut', icon: '🍩'},
-    {name: 'Croissant', icon: '🥐'},
-    {name: 'Cookie', icon: '🍪'}
-];
-
 class Coder {
     constructor(pos) {
         this.pos = pos;
@@ -90,6 +74,7 @@ class Coder {
         this.craving = coffee;
         this.renderBubble(this.coffeePreference);
         this.bubble.show();
+        fgLayer.draw();
         console.log(`${this.fname} wants a ${coffee.name}`);
     }
 
@@ -98,11 +83,13 @@ class Coder {
         this.craving = treat;
         this.renderBubble(treat.icon);
         this.bubble.show();
+        fgLayer.draw();
         console.log(`${this.fname} wants a ${treat.name}`);
         // Time it out:
         setTimeout(() => {
             this.craving = null;
             this.bubble.hide();
+            fgLayer.draw();
         }, 3000 + 1000 * Math.random());
     }
 

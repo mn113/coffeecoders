@@ -1,24 +1,63 @@
-var coffeeMenuOrigin = {x: 95, y: 70};
-var coffeeBrewOrigin = {x: 95, y: 88};
+var coffeeMenuOrigin = {x: 90, y: 70};
+var coffeeBrewOrigin = {x: 90, y: 90};
 var activeCoffee = null;
 
+const coffees = [
+    {name: 'Americano', strength: 0.8, img: 'img/americano.svg', imgObj: null},
+    {name: 'Latte', strength: 0.9, img: 'img/latte.svg', imgObj: null},
+    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.svg', imgObj: null},
+    {name: 'Espresso', strength: 1, img: 'img/espresso.svg', imgObj: null},
+    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.svg', imgObj: null},
+    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.svg', imgObj: null},
+    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.svg'}
+];
+
+const foods = [
+    {name: 'Donut', icon: '🍩'},
+    {name: 'Croissant', icon: '🥐'},
+    {name: 'Cookie', icon: '🍪'}
+];
+
 // Load a coffee sprite, either for the menu system or for dragging to coders:
-function loadCoffee(index, isMenu = false) {
-    var img = new Image(24,24);
-    img.src = coffees[index].img;
-    img.onload = function() {
-        var coffeeObj = new Konva.Image({
-            image: img,
-            name: coffees[index].name,
-            x: coffeeMenuOrigin.x,
-            y: coffeeMenuOrigin.y,
-            offset: {
-                x: 12,
-                y: 12
-            }
-        });
-        // Interactivity:
-        coffeeObj
+class Coffee {
+    constructor(index, isMenu = false) {
+        this.name = coffees[index].name;
+        this.strength = coffees[index].strength;
+        this.imgUrl = coffees[index].img;
+        this.coffeeObj = null;
+        this.index = index;
+        this.isMenu = isMenu;
+
+        this.render();      
+        console.log("Loaded 1", this.name);
+    }
+
+    render() {
+        var me = this;
+        var img = new Image(24,24);
+        img.src = this.imgUrl;
+        img.onload = function() {
+            me.coffeeObj = new Konva.Image({
+                image: img,
+                name: this.name,
+                x: coffeeMenuOrigin.x,
+                y: coffeeMenuOrigin.y,
+                offset: {
+                    x: 12,
+                    y: 12
+                }
+            });
+            // Interactivity:
+            me.wireUp();
+            coffeeLayer.add(me.coffeeObj);
+            coffeeLayer.draw();
+        }
+    }
+
+    wireUp() {
+        var me = this;
+
+        this.coffeeObj
         .on('mouseover', function() {
             this.cache();
             this.filters([Konva.Filters.Invert]);
@@ -30,42 +69,147 @@ function loadCoffee(index, isMenu = false) {
             coffeeLayer.draw();
         });
         // Conditional interactivity:
-        if (isMenu) {
-            coffeeObj.opacity(0);
-            coffeeObj.on('click', function() {
-                brewCoffee(index);
-                closeCoffeeMenu();
+        if (this.isMenu) {
+            this.coffeeObj.opacity(0);
+            this.coffeeObj.on('click', function() {
+                if (!coffeeMachine.brewing) {
+                    coffeeMachine.selectCoffee(this.index);
+                    coffeeMachine.closeMenu();
+                }
             });
         }
         else {
-            coffeeObj.x(coffeeBrewOrigin.x);
-            coffeeObj.y(coffeeBrewOrigin.y);
-            coffeeObj.draggable(true);
-            coffeeObj
+            this.coffeeObj.x(coffeeBrewOrigin.x);
+            this.coffeeObj.y(coffeeBrewOrigin.y);
+            this.coffeeObj.draggable(true);
+            this.coffeeObj
             .on('dragstart', function() {
-                activeCoffee = coffeeObj;
+                activeCoffee = me.coffeeObj;
+            })
+            .on('dragend', function() {
+                //TODO: springback?
             });
         }
-        coffeeLayer.add(coffeeObj);
-        coffeeLayer.draw();
-
-        // Store for later, if not already:
-        if (!coffees[index].imgObj) coffees[index].imgObj = coffeeObj;
-
-        console.log("Loaded 1", coffees[index].name);
-
-        return coffeeObj;
-    };
-}
-
-// Load the 7 coffee images:
-function loadMenuCoffees() {
-    for (let i = 0; i < coffees.length; i++) {
-        loadCoffee(i, true);
     }
-    coffeeLayer.draw();
 }
-loadMenuCoffees();
+
+class CoffeeMachine {
+    constructor() {
+        // Clone a chunk of the background, to avoid an extra coffee machine graphic:
+        this.shape = bgObj.clone({
+            crop: {
+                x: 76,
+                y: 56,
+                width: 28,
+                height: 44
+            },
+            rotation: 180,
+            draggable: true
+        })
+        .moveTo(machineLayer);
+        machineLayer.draw();
+
+        // Coffee machine hit region:
+        this.hitRegion = new Konva.Rect({
+            x: 76,
+            y: 56,
+            width: 28,
+            height: 44,
+            stroke: 'blue',
+            strokeWidth: 0.5,
+            opacity: 0.25
+        })
+        .on('mouseover', () => {
+            document.body.style.cursor = 'pointer';
+        })
+        .on('mouseout', () => {
+            document.body.style.cursor = 'default';
+        })
+        .on('click', () => {
+            this.openMenu();
+        });
+
+        // Store the coffees here:
+        this.icons = [];
+        this.brewing = false;
+
+        //machineLayer.add(this.hitRegion, this.shape);
+
+        // Prepare the menu:
+        this.loadMenuCoffees();
+    }
+
+    // Load the 7 coffee images:
+    loadMenuCoffees() {
+        for (let i = 0; i < coffees.length; i++) {
+            this.icons.push(new Coffee(i, true));
+        }
+        coffeeLayer.draw();
+    }
+
+    // Animate coffee icons into a ring:
+    openMenu() {
+        var positions = ringPos(coffeeMenuOrigin, coffees.length, 20);
+        console.log('positions', positions);
+        for (var i = 0; i < coffees.length; i++) {
+            let tween = new Konva.Tween({
+                node: this.icons[i].coffeeObj,
+                x: positions[i].x,
+                y: positions[i].y,
+                opacity: 1,
+                duration: 1,
+                easing: Konva.Easings.EaseOut
+            });
+            tween.play();
+        }
+        coffeeLayer.draw();
+    }
+
+    // Animate menu closed & disable hittability:
+    closeMenu() {
+        for (var i = 0; i < coffees.length; i++) {
+            let tween = new Konva.Tween({
+                node: this.icons[i].coffeeObj,
+                x: coffeeMenuOrigin.x,
+                y: coffeeMenuOrigin.y,
+                opacity: 0,
+                duration: 1,
+                easing: Konva.Easings.EaseOut
+            });
+            tween.play();
+        }
+        coffeeLayer.draw();
+    }
+
+    // Generate a coffee to be dragged out:
+    selectCoffee(index) {
+        console.log("Selected", coffees[index].name);
+        // Block menu:
+        this.brewing = true;
+        // TODO: play sound
+
+        // Play animation:
+        this.jiggle();
+        setTimeout(function() {
+            new Coffee(index, false);
+            this.brewing = false;
+        }, 2000);
+    }
+
+    jiggle() {
+        var me = this;
+        var flipflop = -2;
+        var anim = new Konva.Animation(function(frame) {
+            // Last 2 seconds:
+            if (frame.time > 2000) anim.stop();
+            // Jitter left then right, ad infinitum:
+            me.shape.offsetX(flipflop);
+            flipflop *= -1;
+        }, machineLayer);
+            
+        anim.start();
+    }
+}
 
 // Calculate positions of objects around a ring:
 function ringPos(centre, total, radius) {
@@ -80,49 +224,5 @@ function ringPos(centre, total, radius) {
     return positions;
 }
 
-// Animate coffee icons into a ring:
-function openCoffeeMenu() {
-    var positions = ringPos(coffeeMenuOrigin, coffees.length, 20);
-    console.log('positions', positions);
-    for (var i = 0; i < coffees.length; i++) {
-        //coffees[i].imgObj.position(positions[i]);
-        let tween = new Konva.Tween({
-            node: coffees[i].imgObj,
-            x: positions[i].x,
-            y: positions[i].y,
-            opacity: 1,
-            duration: 1,
-            easing: Konva.Easings.EaseOut
-        });
-        tween.play();
-    }
-    coffeeLayer.draw();
-}
-
-// Animate menu closed & disable hittability:
-function closeCoffeeMenu() {
-    for (var i = 0; i < coffees.length; i++) {
-        let tween = new Konva.Tween({
-            node: coffees[i].imgObj,
-            x: coffeeMenuOrigin.x,
-            y: coffeeMenuOrigin.y,
-            opacity: 0,
-            duration: 1,
-            easing: Konva.Easings.EaseOut
-        });
-        tween.play();
-    }
-    coffeeLayer.draw();
-}
-
-// Generate a coffee to be dragged out:
-function brewCoffee(index) {
-    console.log("Selected", coffees[index].name);
-    // TODO:
-    // Block menu
-    // Play sound
-    // Play animation
-    setTimeout(function() {
-        loadCoffee(index, false);
-    }, 2000);
-}
+// Init:
+var coffeeMachine = new CoffeeMachine();

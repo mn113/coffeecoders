@@ -36,16 +36,16 @@ var stage = new Konva.Stage({
     scaleX: 2,
     scaleY: 2
 });
-// HOW TO APPLY? context.imageSmoothingQuality = "low"
 
 // Define layers:
 var bgLayer = new Konva.Layer();
 var menuLayer = new Konva.Layer();
 var scoreLayer = new Konva.Layer();
+var machineLayer = new Konva.Layer();
 var fgLayer = new Konva.Layer();
-var coffeeLayer = new Konva.Layer();
 var screensLayer = new Konva.Layer();
-stage.add(bgLayer, menuLayer, scoreLayer, fgLayer, coffeeLayer, screensLayer);
+var coffeeLayer = new Konva.Layer();
+stage.add(bgLayer, menuLayer, scoreLayer, machineLayer, fgLayer, screensLayer, coffeeLayer);
 
 // Background:
 var bgImg = new Image();
@@ -53,16 +53,17 @@ bgImg.src = `img/office_1920x1080.png`;
 bgImg.onload = function() {
     bgLayer.draw();
 };
-bgLayer.add(new Konva.Image({
+bgObj = new Konva.Image({
     x: 0,
     y: 0,
     width: 480,
     height: 320,
     image: bgImg
-}));
+});
+bgLayer.add(bgObj);
 
-var tools = {};
 // Tool Menu:
+var tools = {};
 function makeToolMenu() {
     var toolNames = ['code', 'fixbugs', 'sleep'];
     tools.code = new Konva.Text({
@@ -120,28 +121,6 @@ function highlightMenu(value) {
     tools.sleep.fill(value === 3 ? "salmon" : "#C0FFEE");
     menuLayer.draw();
 }
-
-// Coffee machine hit region:
-var coffeeMachine = new Konva.Rect({
-    x: 76,
-    y: 56,
-    width: 28,
-    height: 44,
-    stroke: 'blue',
-    strokeWidth: 0.5,
-    opacity: 0.25
-});
-coffeeMachine
-.on('mouseover', function() {
-    document.body.style.cursor = 'pointer';
-})
-.on('mouseout', function() {
-    document.body.style.cursor = 'default';
-})
-.on('click', function() {
-    openCoffeeMenu();
-});
-bgLayer.add(coffeeMachine);
 
 // Score & stats display:
 var scores = {
