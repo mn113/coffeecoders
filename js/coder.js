@@ -6,7 +6,7 @@ Array.prototype.random = function() {
 // Select an element at random from array, delete it and return it:
 Array.prototype.pluck = function() {
     var index = Math.floor(Math.random() * this.length);
-    return this.splice(index, 1);
+    return this.splice(index, 1)[0];
 }
 
 const names = {   // need 12 of each
@@ -50,6 +50,8 @@ class Coder {
         this.craving = null;    // can be a coffee or a food
         this.toDrink = 0;       // empty cup
         this.konvaImg = null;   // Konva shape
+        // Attach a new screen to each coder:
+        this.screen = new Screen(pos);
     }
 
     toString() {
@@ -63,6 +65,7 @@ class Coder {
 
     writeCode() {
         GAME.loc += Math.ceil(10 * this.caffeine);
+        this.screen.writeCode();
     }
 
     writeBugs() {
@@ -130,7 +133,7 @@ class Coder {
             });
             fgLayer.add(me.konvaImg);
             fgLayer.draw();
-            console.log(`Loaded coder ${me.fname} img @ ${me.pos.x},${me.pos.y}`);
+            console.log(`Loaded coder ${me.fname} @ ${me.pos.x},${me.pos.y}`);
             me.wireUp();
         };
     }
@@ -144,7 +147,7 @@ class Coder {
                 document.body.style.cursor = 'pointer';
                 shape.scaleX(1.2);
                 shape.scaleY(1.2);
-                console.log(shape, me);
+                console.log(me);
                 me.nameLabel.show();
                 fgLayer.draw();
             }
@@ -339,8 +342,8 @@ var coderPositions = [
     {x:327, y:223}
 ];
 
-// make 12 coders:
-var n = 12;
+// make 8 coders:
+var n = 8;
 var coders = [];
 for (var i = 0; i < n; i++) {
     coders.push(new Coder(coderPositions[i]));

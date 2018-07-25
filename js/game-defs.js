@@ -2,7 +2,7 @@ const GAME = {
     activeTool: null,
     loc: 0,
     bugs: 0,
-    timeLeft: 3,
+    timeLeft: 10,
     target: {
         loc: 1000,  // TODO: more levels
         bugs: 1000
@@ -41,9 +41,9 @@ bgLayer.add(new Konva.Image({
     image: bgImg
 }));
 
+var tools = {};
 // Tool Menu:
 function makeToolMenu() {
-    var tools = {};
     tools.code = new Konva.Text({
         x: 0,
         y: 0,
@@ -108,40 +108,4 @@ coffeeMachine
 .on('click', function() {
     openCoffeeMenu();
 });
-fgLayer.add(coffeeMachine);
-
-
-// Initial render of coders:
-for (var coder of coders) {
-    coder.render();
-    coder.renderNameLabel();
-    coder.renderBubble('?');
-    coder.renderModeIndicator();
-}
-
-
-// game loop:
-var t = setInterval(() => {
-    for (c of coders) {
-        c.tick();
-        //c.render();
-        c.log();
-    }
-    text.offsetY(text.offsetY() + 1);
-    screensLayer.draw();
-
-    console.info(`${GAME.loc} loc / ${GAME.bugs} bugs`);
-    GAME.timeLeft -= 0.25;
-    if (GAME.timeLeft * 4 % 4 === 0) console.log(GAME.timeLeft);
-    
-    // Check for level success:
-    if (GAME.loc >= GAME.target.loc && GAME.bugs < GAME.target.bugs) {
-        console.log("Level passed!");
-        clearInterval(t);
-    }
-    // Check for time up:
-    else if (GAME.timeLeft <= 0) {
-        console.log("Game over!");
-        clearInterval(t);
-    }
-}, 250);
+bgLayer.add(coffeeMachine);
