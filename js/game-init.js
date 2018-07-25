@@ -6,6 +6,8 @@ for (var coder of coders) {
     coder.renderModeIndicator();
 }
 
+loadLevel(0);
+
 // game loop:
 var t = setInterval(() => {
     for (c of coders) {
@@ -13,6 +15,7 @@ var t = setInterval(() => {
         //c.render();
         c.log();
     }
+    updateScores();
 
     console.info(`${GAME.loc} loc / ${GAME.bugs} bugs`);
     GAME.timeLeft -= 0.25;

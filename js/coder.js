@@ -10,8 +10,8 @@ Array.prototype.pluck = function() {
 }
 
 const names = {   // need 12 of each
-    male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo"],
-    female: ["Aroma", "Illy", "Jo", "Flo", "Cath", "Maureen"],
+    male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo", "George", "Elliott"],
+    female: ["Aroma", "Illy", "Jo", "Flo", "Cath", "Maureen", "Heather", "Steamy"],
     last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Stahbux", "Bean", "Nero",
             "Q. Rigg", "Macupp", "Black", "Press", "Robusta", "DiCaff"]
 };
@@ -69,7 +69,7 @@ class Coder {
     }
 
     writeBugs() {
-        GAME.bugs += Math.ceil(2 * this.caffeine);
+        GAME.bugs += Math.ceil(0.5 * this.caffeine);
     }
 
     fixBugs() {
@@ -78,6 +78,7 @@ class Coder {
 
     sleep() {
         this.sleepNeeded--;
+        this.screen.sleep();
     }
 
     wantCoffee() {
@@ -304,7 +305,7 @@ class Coder {
                 break;
             
             case 'fixing':
-                this.fixBugs();
+                this.fixBug();
                 break;
 
             case 'sleeping':

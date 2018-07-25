@@ -44,6 +44,7 @@ class Screen {
     }
 
     writeCode() {
+        this.greenCode.show();
         // Scroll green text by one line:
         this.greenCode.offsetY(this.greenCode.offsetY() + 2);
         // Reset before off screen:
@@ -65,8 +66,19 @@ class Screen {
         screensLayer.draw();
     }
 
-    fixBugs() {
-        // switch out green text for blueish animation?
+    fixBug() {
+        // Use filters to tweak hue of green text:
+        //var bugColor = Konva.Util.getRandomColor();
+        this.greenCode.show();
+        this.greenCode.cache();
+        this.greenCode.filter([Konva.Filters.HSL, Konva.Filters.Noise]);
+        this.greenCode.hue(Math.random() * 360);
+        this.greenCode.noise(0.5);
+        screensLayer.draw();
+    }
+
+    sleep() {
+        this.greenCode.hide();
         screensLayer.draw();                
     }
 }
