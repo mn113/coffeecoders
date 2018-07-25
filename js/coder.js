@@ -70,10 +70,12 @@ class Coder {
 
     writeBugs() {
         GAME.bugs += Math.ceil(0.5 * this.caffeine);
+        this.screen.writeBug();
     }
 
-    fixBugs() {
+    fixBug() {
         GAME.bugs -= Math.ceil(2 * this.caffeine);
+        this.screen.fixBug();
     }
 
     sleep() {
@@ -146,9 +148,8 @@ class Coder {
             var shape = evt.target;
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'pointer';
-                shape.scaleX(1.2);
-                shape.scaleY(1.2);
                 console.log(me);
+                me.highlight();
                 me.nameLabel.show();
                 fgLayer.draw();
             }
@@ -156,8 +157,7 @@ class Coder {
             var shape = evt.target;
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'default';
-                shape.scaleX(1);
-                shape.scaleY(1);
+                me.unhighlight();
                 me.nameLabel.hide();
                 fgLayer.draw();
             }
@@ -175,7 +175,7 @@ class Coder {
             me.unhighlight();
         })
         .on('drop', function() {
-            console.log(`Dropped ${activeCoffee.name} on ${me.fname}`);
+            console.log(`Dropped ${activeCoffee.name()} on ${me.fname}`);
             me.addCoffee(activeCoffee);
             // Destroy coffee
             activeCoffee.destroy();
@@ -343,8 +343,8 @@ var coderPositions = [
     {x:327, y:223}
 ];
 
-// make 8 coders:
-var n = 8;
+// make 2 coders:
+var n = 2;
 var coders = [];
 for (var i = 0; i < n; i++) {
     coders.push(new Coder(coderPositions[i]));

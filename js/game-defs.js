@@ -49,7 +49,7 @@ stage.add(bgLayer, menuLayer, scoreLayer, fgLayer, coffeeLayer, screensLayer);
 
 // Background:
 var bgImg = new Image();
-bgImg.src = `img/office.svg`;
+bgImg.src = `img/office_1920x1080.png`;
 bgImg.onload = function() {
     bgLayer.draw();
 };
@@ -112,12 +112,13 @@ function highlightMenu(value) {
 
 // Coffee machine hit region:
 var coffeeMachine = new Konva.Rect({
-    x: 84,
-    y: 64,
-    width: 24,
-    height: 36,
-    fill: 'yellow',
-    opacity: 0.2
+    x: 76,
+    y: 56,
+    width: 28,
+    height: 44,
+    stroke: 'blue',
+    strokeWidth: 0.5,
+    opacity: 0.25
 });
 coffeeMachine
 .on('mouseover', function() {
@@ -171,7 +172,9 @@ scoreLayer.add(...Object.values(scores));
 
 function updateScores() {
     // Update clock:
-    scores.timerText.text(Math.ceil(GAME.timeLeft));
+    var time = Math.ceil(GAME.timeLeft);
+    if (time < 10) time = '0' + time;
+    scores.timerText.text(time);
     // Update loc/bugs:
     scores.locText.text(GAME.loc + ' lines of code');
     scores.bugsText.text(GAME.bugs + ' bugs');

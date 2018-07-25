@@ -17,7 +17,6 @@ var t = setInterval(() => {
     }
     updateScores();
 
-    console.info(`${GAME.loc} loc / ${GAME.bugs} bugs`);
     GAME.timeLeft -= 0.25;
     if (GAME.timeLeft * 4 % 4 === 0) console.log(GAME.timeLeft);
     
