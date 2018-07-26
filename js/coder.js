@@ -72,7 +72,7 @@ class Coder {
     wantCoffee() {
         var coffee = coffees[this.coffeePreference];
         this.craving = coffee;
-        this.renderBubble(this.coffeePreference);
+        this.updateBubble(this.coffeePreference);
         this.bubble.show();
         fgLayer.draw();
         console.log(`${this.fname} wants a ${coffee.name}`);
@@ -81,7 +81,7 @@ class Coder {
     wantSugar() {
         var treat = foods.random();
         this.craving = treat;
-        this.renderBubble(treat.icon);
+        this.updateBubble(treat.icon);
         this.bubble.show();
         fgLayer.draw();
         console.log(`${this.fname} wants a ${treat.name}`);
@@ -95,7 +95,8 @@ class Coder {
 
     // Inject coffee, altering coder's stats:
     addCoffee(coffee) {
-        this.caffeine += coffee.strength / 10;
+        console.info('Add', coffee);
+        this.caffeine += coffee.strength / 8;
         this.caffeine = Math.min(1, this.caffeine);
         this.tolerance += 0.03;
         this.falloff -= 0.03;
@@ -126,8 +127,9 @@ class Coder {
             fgLayer.add(me.konvaImg);
             fgLayer.draw();
             console.log(`Loaded coder ${me.fname} @ ${me.pos.x},${me.pos.y}`);
-            me.renderNameLabel();
-            me.renderBubble('?');
+            me.createNameLabel();
+            me.createBubble();
+            me.createCaffBar(me.caffeine);
             me.wireUp();
         };
     }
@@ -163,16 +165,18 @@ class Coder {
             me.unhighlight();
         })
         .on('drop', function() {
-            console.log(`Dropped ${activeCoffee.name()} on ${me.fname}`);
+            console.log(`Dropped ${activeCoffee.name} on ${me.fname}`);
             me.addCoffee(activeCoffee);
             // Destroy coffee
-            activeCoffee.destroy();
+            activeCoffee.coffeeObj.destroy();   // FIXME
             activeCoffee = null;
+            fgLayer.draw();
+            coffeeLayer.draw();
         });
     }
 
     // Add a name label above the coder (run once):
-    renderNameLabel() {
+    createNameLabel() {
         // create label
         this.nameLabel = new Konva.Label({
             x: this.pos.x - 30,
@@ -196,7 +200,7 @@ class Coder {
     }
     
     // Add a speech bubble comprised of a Label, Tag & Text (run once):
-    renderBubble(content) {
+    createBubble() {
         // create label
         this.bubble = new Konva.Label({
             x: this.pos.x + 12,
@@ -222,7 +226,7 @@ class Coder {
         
         // add text to the label
         this.bubble.add(new Konva.Text({
-            text: content,
+            text: '',
             fontSize: 10,
             padding: 2
         }));
@@ -230,8 +234,14 @@ class Coder {
         fgLayer.add(this.bubble);
     }
 
-    // Render a bar graph of the caffeine level (every tick):
-    renderCaffBar(value) {
+    // Change the text content of the speech bubble:
+    updateBubble(content) {
+        this.bubble.getChildren(node => node.className == 'Text')[0].text(content);
+    }
+
+    // Render a bar graph of the caffeine level (run once):
+    createCaffBar(value) {
+        console.log('createCaffBar', value);
         this.caffBar = new Konva.Rect({
             x: this.pos.x - 12,
             y: this.pos.y + 20,
@@ -239,12 +249,21 @@ class Coder {
             height: 5,
             fillLinearGradientStartPoint: {x: 0, y: 0},
             fillLinearGradientEndPoint: {x: 24, y: 0},
-            fillLinearGradientColorStops: [0, 'chocolate', value, 'chocolate', value, 'black', 1, 'black'],
+            fillLinearGradientColorStops: [0, 'chocolate', value, 'chocolate', value + 0.001, 'black', 1, 'black'],
             stroke: 'white',
             strokeWidth: 0.5
         });
     
         fgLayer.add(this.caffBar);
+        this.caffBar.draw();
+    }
+
+    // Update bar's value (every tick):
+    updateCaffBar(value) {
+        console.log('updateCaffBar', value);
+        if (!this.caffBar) return;  // safeguard in case it's updated before created
+        // Replicate the gradient settings with new color stop value:
+        this.caffBar.setFillLinearGradientColorStops([0, 'chocolate', value, 'chocolate', value + 0.001, 'black', 1, 'black']);
         this.caffBar.draw();
     }
 
@@ -286,7 +305,7 @@ class Coder {
         this.toDrink = Math.max(0, this.toDrink);
         this.caffeine -= 0.02 * this.falloff; // make geometric?
         this.caffeine = Math.max(0.1, this.caffeine);
-        this.renderCaffBar(this.caffeine);
+        this.updateCaffBar(this.caffeine);
 
         // Initialise new food/drink craving?
         if (!this.craving) {

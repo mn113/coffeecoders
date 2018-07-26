@@ -53,7 +53,7 @@ bgImg.src = `img/office_1920x1080.png`;
 bgImg.onload = function() {
     bgLayer.draw();
 };
-bgObj = new Konva.Image({
+var bgObj = new Konva.Image({
     x: 0,
     y: 0,
     width: 480,
@@ -73,10 +73,6 @@ function makeToolMenu() {
         fontSize: 20,
         fill: "#C0FFEE"
     });
-    /*tools.code.on('click', function() {
-        GAME.activeTool = 'code';
-        highlightMenu(1);
-    });*/
     tools.fixbugs = new Konva.Text({
         x: 40,
         y: 20,
@@ -84,10 +80,6 @@ function makeToolMenu() {
         fontSize: 16,
         fill: "#C0FFEE"
     });
-    /*tools.fixbugs.on('click', function() {
-        GAME.activeTool = 'fixbugs';
-        highlightMenu(2);
-    });*/
     tools.sleep = new Konva.Text({
         x: 130,
         y: 20,

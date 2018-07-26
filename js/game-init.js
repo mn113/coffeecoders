@@ -5,7 +5,7 @@ var t = setInterval(() => {
     for (c of coders) {
         c.tick();
         //c.render();
-        c.log();
+        //c.log();
     }
     updateScores();
 

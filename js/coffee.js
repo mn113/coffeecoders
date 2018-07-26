@@ -3,13 +3,13 @@ var coffeeBrewOrigin = {x: 90, y: 90};
 var activeCoffee = null;
 
 const coffees = [
-    {name: 'Americano', strength: 0.8, img: 'img/americano.svg', imgObj: null},
-    {name: 'Latte', strength: 0.9, img: 'img/latte.svg', imgObj: null},
-    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.svg', imgObj: null},
-    {name: 'Espresso', strength: 1, img: 'img/espresso.svg', imgObj: null},
-    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.svg', imgObj: null},
-    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.svg', imgObj: null},
-    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.svg'}
+    {name: 'Americano', strength: 0.8, img: 'img/americano.png'},
+    {name: 'Latte', strength: 0.9, img: 'img/latte.png'},
+    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.png'},
+    {name: 'Espresso', strength: 1, img: 'img/espresso.png'},
+    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.png'},
+    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.png'},
+    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.png'}
 ];
 
 const foods = [
@@ -59,11 +59,14 @@ class Coffee {
 
         this.coffeeObj
         .on('mouseover', function() {
+            document.body.style.cursor = 'pointer';
             this.cache();
-            this.filters([Konva.Filters.Invert]);
+            this.filters([Konva.Filters.Brighten]);
+            this.brightness(0.2);
             coffeeLayer.draw();
         })
         .on('mouseout', function() {
+            document.body.style.cursor = 'default';
             this.cache();
             this.filters([]);
             coffeeLayer.draw();
@@ -83,11 +86,18 @@ class Coffee {
             this.coffeeObj.y(coffeeBrewOrigin.y);
             this.coffeeObj.draggable(true);
             this.coffeeObj
+            .on('mouseover', function() {
+                document.body.style.cursor = 'move';
+            })
+            .on('mouseout', function() {
+                document.body.style.cursor = 'pointer';
+            })
             .on('dragstart', function() {
-                activeCoffee = me.coffeeObj;
+                activeCoffee = me;
+                coffeeLayer.draw();
             })
             .on('dragend', function() {
-                //TODO: springback?
+                //TODO: check for intersection with coder, if not, springback
             });
         }
     }

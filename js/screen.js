@@ -1,4 +1,4 @@
-//Code on screens...
+// Creates a screen with code on it
 class Screen {
     constructor(coderPos) {
         console.log("new Screen @", coderPos);
