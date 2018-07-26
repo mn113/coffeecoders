@@ -1,31 +1,38 @@
-const GAME = {
+var GAME = {
     activeTool: null,
     loc: 0,
     bugs: 0,
     timeLeft: 0,
     target: {},
+    level: 0,
     levels: [
-        {coders: 2, target: {loc: 1000, bugs: 350}, timeBoost: 45},
-        {coders: 3, target: {loc: 1500, bugs: 325}, timeBoost: 25},
-        {coders: 4, target: {loc: 2100, bugs: 300}, timeBoost: 20},
-        {coders: 5, target: {loc: 2700, bugs: 270}, timeBoost: 20},
-        {coders: 6, target: {loc: 3300, bugs: 300}, timeBoost: 15},
-        {coders: 7, target: {loc: 3800, bugs: 340}, timeBoost: 15},
-        {coders: 8, target: {loc: 4500, bugs: 375}, timeBoost: 10},
-        {coders: 9, target: {loc: 5000, bugs: 425}, timeBoost: 10},
-        {coders: 10, target: {loc: 5750, bugs: 500}, timeBoost: 5},
+        {coders: 2, target: {loc: 500, bugs: 450}, timeBoost: 45},
+        {coders: 3, target: {loc: 750, bugs: 425}, timeBoost: 30},
+        {coders: 4, target: {loc: 1050, bugs: 400}, timeBoost: 25},
+        {coders: 5, target: {loc: 1350, bugs: 370}, timeBoost: 20},
+        {coders: 6, target: {loc: 1650, bugs: 400}, timeBoost: 20},
+        {coders: 7, target: {loc: 1900, bugs: 440}, timeBoost: 15},
+        {coders: 8, target: {loc: 2250, bugs: 475}, timeBoost: 15},
+        {coders: 9, target: {loc: 2500, bugs: 525}, timeBoost: 10},
+        {coders: 10, target: {loc: 5750, bugs: 600}, timeBoost: 10},
         {coders: 11, target: {loc: 6200, bugs: 550}, timeBoost: 5},
-        {coders: 12, target: {loc: 7000, bugs: 600}, timeBoost: 0}
+        {coders: 12, target: {loc: 7000, bugs: 700}, timeBoost: 0}
     ]
 };
 
 function loadLevel(n) {
+    GAME.level = n;
     GAME.target = GAME.levels[n].target;
     GAME.timeLeft = GAME.timeLeft + GAME.levels[n].timeBoost;
+    
+    // Hire any new coders up to level's amount (typically just 1):
     while (coders.length < GAME.levels[n].coders) {
         coders.push(new Coder(coderPositions[coders.length]));
     }
     scoreLayer.draw();
+    fgLayer.draw();
+
+    showMessage("Level " + (n+1));
 }
 
 // Set up Konva:
