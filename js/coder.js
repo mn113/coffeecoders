@@ -241,7 +241,6 @@ class Coder {
 
     // Render a bar graph of the caffeine level (run once):
     createCaffBar(value) {
-        console.log('createCaffBar', value);
         this.caffBar = new Konva.Rect({
             x: this.pos.x - 12,
             y: this.pos.y + 20,
@@ -260,7 +259,6 @@ class Coder {
 
     // Update bar's value (every tick):
     updateCaffBar(value) {
-        console.log('updateCaffBar', value);
         if (!this.caffBar) return;  // safeguard in case it's updated before created
         // Replicate the gradient settings with new color stop value:
         this.caffBar.setFillLinearGradientColorStops([0, 'chocolate', value, 'chocolate', value + 0.001, 'black', 1, 'black']);

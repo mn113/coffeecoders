@@ -10,7 +10,7 @@ var t = setInterval(() => {
     updateScores();
 
     GAME.timeLeft -= 0.25;
-    if (GAME.timeLeft * 4 % 4 === 0) console.log(GAME.timeLeft);
+    if (GAME.timeLeft * 4 % 4 === 0) console.warn(`${GAME.timeLeft} seconds`);
     
     // Check for level success:
     if (GAME.loc >= GAME.target.loc && GAME.bugs < GAME.target.bugs) {

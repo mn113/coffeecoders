@@ -3,13 +3,13 @@ var coffeeBrewOrigin = {x: 90, y: 90};
 var activeCoffee = null;
 
 const coffees = [
-    {name: 'Americano', strength: 0.8, img: 'img/americano.png'},
-    {name: 'Latte', strength: 0.9, img: 'img/latte.png'},
-    {name: 'Cappuccino', strength: 1, img: 'img/cappuccino.png'},
-    {name: 'Espresso', strength: 1, img: 'img/espresso.png'},
-    {name: 'Mocha', strength: 1.3, img: 'img/moccacino.png'},
-    {name: 'Iced Coffee', strength: 1.5, img: 'img/frappuccino.png'},
-    {name: 'Double Espresso', strength: 2, img: 'img/espresso-doppio.png'}
+    {name: 'Americano', strength: 0.8, img: 'img/coffees/americano.png'},
+    {name: 'Latte', strength: 0.9, img: 'img/coffees/latte.png'},
+    {name: 'Cappuccino', strength: 1, img: 'img/coffees/cappuccino.png'},
+    {name: 'Espresso', strength: 1, img: 'img/coffees/espresso.png'},
+    {name: 'Mocha', strength: 1.3, img: 'img/coffees/moccacino.png'},
+    {name: 'Iced Coffee', strength: 1.5, img: 'img/coffees/frappuccino.png'},
+    {name: 'Double Espresso', strength: 2, img: 'img/coffees/espresso-doppio.png'}
 ];
 
 const foods = [
@@ -105,30 +105,24 @@ class Coffee {
 
 class CoffeeMachine {
     constructor() {
-        // Clone a chunk of the background, to avoid an extra coffee machine graphic:
-        this.shape = bgObj.clone({
-            crop: {
-                x: 76,
-                y: 56,
-                width: 28,
-                height: 44
-            },
-            rotation: 180,
-            draggable: true
-        })
-        .moveTo(machineLayer);
-        machineLayer.draw();
-
-        // Coffee machine hit region:
-        this.hitRegion = new Konva.Rect({
-            x: 76,
-            y: 56,
-            width: 28,
+        // Re-use the background, to avoid an extra coffee machine graphic:
+        var img = new Image();
+        img.src = `img/coffeemachine.png`;
+        img.onload = function() {
+            machineLayer.draw();
+        };
+        this.machineObj = new Konva.Image({
+            x: 77,
+            y: 57,
+            width: 27,
             height: 44,
-            stroke: 'blue',
-            strokeWidth: 0.5,
-            opacity: 0.25
-        })
+            image: img
+  
+        });
+        machineLayer.add(this.machineObj);
+
+        // Attach machine behaviour:
+        this.machineObj
         .on('mouseover', () => {
             document.body.style.cursor = 'pointer';
         })
@@ -211,9 +205,12 @@ class CoffeeMachine {
         var flipflop = -2;
         var anim = new Konva.Animation(function(frame) {
             // Last 2 seconds:
-            if (frame.time > 2000) anim.stop();
+            if (frame.time > 2000) {
+                anim.stop();
+                me.machineObj.offsetX(0);    
+            }
             // Jitter left then right, ad infinitum:
-            me.shape.offsetX(flipflop);
+            me.machineObj.offsetX(flipflop);
             flipflop *= -1;
         }, machineLayer);
             
