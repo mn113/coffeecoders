@@ -217,6 +217,7 @@ scoreLayer.add(...Object.values(scores));
 function updateScores() {
     // Update clock:
     var time = Math.floor(GAME.timeLeft);
+    scores.timerText.fill(`rgb(255,${time*6},0)`); // fill goes from yellow to red as time decreases
     if (time < 10) time = '0' + time;
     scores.timerText.text(time);
     // Update loc/bugs:

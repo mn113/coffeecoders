@@ -109,7 +109,7 @@ function showMessage(options) {
             console.log("autoCancelled message");
             modalLayer.clear().destroyChildren();
             modalLayer.draw();
-        }, 750);
+        }, 1500);
     }
 
     modalLayer.add(messageGroup);
