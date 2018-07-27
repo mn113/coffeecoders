@@ -52,7 +52,8 @@ var machineLayer = new Konva.Layer();
 var fgLayer = new Konva.Layer();
 var screensLayer = new Konva.Layer();
 var coffeeLayer = new Konva.Layer();
-stage.add(bgLayer, menuLayer, scoreLayer, machineLayer, fgLayer, screensLayer, coffeeLayer);
+var modalLayer = new Konva.Layer();
+stage.add(bgLayer, menuLayer, scoreLayer, machineLayer, fgLayer, screensLayer, coffeeLayer, modalLayer);
 
 // Background:
 var bgImg = new Image();
