@@ -164,7 +164,9 @@ showMessage({
         action: function() {
             modalLayer.clear().destroyChildren();
             modalLayer.draw();
+            menuLayer.draw();
             loadLevel(0);
+            sounds.play('coin');
             //sounds.setMusic(true);
             //sounds.setTyping(true);
             play();

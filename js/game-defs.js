@@ -32,7 +32,11 @@ function loadLevel(n) {
     scoreLayer.draw();
     fgLayer.draw();
 
-    showMessage("Level " + (n+1));
+    /*showMessage({
+        heading: `Level ${n+1}`,
+        subtext: "",
+        autoCancel: true
+    });*/
 }
 
 // Set up Konva:
@@ -73,30 +77,76 @@ bgLayer.add(bgObj);
 // Tool Menu:
 var tools = {};
 function makeToolMenu() {
-    var toolNames = ['code', 'fixbugs', 'sleep'];
-    tools.code = new Konva.Text({
+    var toolNames = ['code', 'fixbugs'];//, 'sleep'];
+    
+    // First:
+    var codeImg = new Image();
+    codeImg.src = `img/writecode.png`;
+    codeImg.onload = function() {
+        menuLayer.draw();
+    };
+    tools.code = new Konva.Group();
+    tools.code.add(new Konva.Rect({
+        x: 38,
+        y: 3,
+        width: 85,
+        height: 30,
+        strokeWidth: 1,
+        stroke: '#333',
+        cornerRadius: 3
+    }));
+    tools.code.add(new Konva.Image({
         x: 40,
-        y: 0,
-        text: 'WRITE CODE',
-        fontSize: 20,
-        fill: "#C0FFEE"
-    });
-    tools.fixbugs = new Konva.Text({
-        x: 40,
-        y: 20,
-        text: 'FIX BUGS',
+        y: 5,
+        width: 25,
+        height: 25,
+        image: codeImg
+    }));
+    tools.code.add(new Konva.Text({
+        x: 70,
+        y: 5,
+        text: 'WRITE\nCODE',
+        fontVariant: 'bold',
         fontSize: 16,
+        lineHeight: 0.88,
         fill: "#C0FFEE"
-    });
-    tools.sleep = new Konva.Text({
+    }));
+
+    // Second:
+    var fixImg = new Image();
+    fixImg.src = `img/fixbugs.png`;
+    fixImg.onload = function() {
+        menuLayer.draw();
+    };
+    tools.fixbugs = new Konva.Group();
+    tools.fixbugs.add(new Konva.Rect({
+        x: 128,
+        y: 3,
+        width: 80,
+        height: 30,
+        strokeWidth: 1,
+        stroke: '#333',
+        cornerRadius: 3
+    }));
+    tools.fixbugs.add(new Konva.Image({
         x: 130,
-        y: 20,
-        text: 'SLEEP',
+        y: 5,
+        width: 25,
+        height: 25,
+        image: fixImg
+    }));
+    tools.fixbugs.add(new Konva.Text({
+        x: 160,
+        y: 5,
+        text: 'FIX\nBUGS',
+        fontVariant: 'bold',
         fontSize: 16,
+        lineHeight: 0.88,
         fill: "#C0FFEE"
-    });
+    }));
+
     // Tool behaviours:
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < toolNames.length; i++) {
         tools[toolNames[i]]
         .on('click', function() {
             GAME.activeTool = toolNames[i];
@@ -104,21 +154,24 @@ function makeToolMenu() {
         })
         .on('mouseover', function() {
             document.body.style.cursor = 'pointer';
+            this.getChildren()[0].stroke('#C0FFEE');
+            menuLayer.draw();
         })
         .on('mouseout', function() {
             document.body.style.cursor = 'default';
+            this.getChildren()[0].stroke('black');
+            menuLayer.draw();
         });
     }
-    menuLayer.add(tools.code, tools.fixbugs, tools.sleep);
-    menuLayer.draw();
+    menuLayer.add(tools.code, tools.fixbugs);//, tools.sleep);
 }
 makeToolMenu();
 
 // Apply colour styles to the tool menu:
 function highlightMenu(value) {
-    tools.code.fill(value === 1 ? "salmon" : "#C0FFEE");
-    tools.fixbugs.fill(value === 2 ? "salmon" : "#C0FFEE");
-    tools.sleep.fill(value === 3 ? "salmon" : "#C0FFEE");
+    tools.code.getChildren()[2].fill(value === 1 ? "salmon" : "#C0FFEE");
+    tools.fixbugs.getChildren()[2].fill(value === 2 ? "salmon" : "#C0FFEE");
+    //tools.sleep.fill(value === 3 ? "salmon" : "#C0FFEE");
     menuLayer.draw();
 }
 
