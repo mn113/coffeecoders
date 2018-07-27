@@ -20,6 +20,7 @@ function play() {
                     subtext: 'A new coder joins the team...',
                     autoCancel: true
                 });
+                sounds.play('levelup');
                 loadLevel(GAME.level += 1);    // new coder hired here
                 play();
             }
@@ -49,6 +50,7 @@ function gameOver(result) {
             },
             autoCancel: false
         });
+        sounds.play('gameover');
     }
     else if (result == 'won') {
         showMessage({
@@ -56,6 +58,7 @@ function gameOver(result) {
             subtext: "The project was completed on time and can be shipped! (You beat the game!)\nBest of luck in your next endeavour.",
             autoCancel: false
         });
+        sounds.play('triumph');
     }
 }
 
@@ -104,7 +107,7 @@ function showMessage(options) {
     if (options.autoCancel) {
         setTimeout(function() {
             console.log("autoCancelled message");
-            messageGroup.destroy();
+            modalLayer.clear().destroyChildren();
             modalLayer.draw();
         }, 750);
     }
@@ -155,12 +158,15 @@ function makeButton(options) {
 // Begin the game with a modal message:
 showMessage({
     heading: "Welcome",
-    subtext: "to Coffee Coders,\na project management simulation.",
+    subtext: "to Coffee Coders, a software project\nmanagement simulation.",
     button: {
         text: "Play!",
         action: function() {
             modalLayer.clear().destroyChildren();
+            modalLayer.draw();
             loadLevel(0);
+            //sounds.setMusic(true);
+            //sounds.setTyping(true);
             play();
         }
     },

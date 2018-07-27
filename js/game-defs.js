@@ -175,3 +175,48 @@ function updateScores() {
 
     scoreLayer.draw();
 }
+
+// Sounds:
+var sounds = {
+    coin: "sfx/coin.mp3",   // ok
+    machine: "sfx/machine-pour-ping.mp3",   // ok
+    slurp: "sfx/slurp.mp3", // ok
+    powerup: "sfx/powerup.mp3", // ok (to wire...)
+    sugar: "sfx/sugar.mp3", // ok (to wire...)
+    levelup: "sfx/powerup.mp3",  // ok
+    gameover: "sfx/gameover.mp3",   // ok
+    triumph: "sfx/triumph.mp3", // ok
+
+    // Create and play a one-off sound effect:
+	play: function(name) {
+        var player = new Audio(sounds[name]);
+        player.volume = 0.5;
+		player.play();  // will be stopped and garbage-collected when audio ends
+    },
+
+    music: new Audio("sfx/Lee_Rosevere_Telecom.mp3"),
+    
+    // Turn music on or off:
+    setMusic: function(enable) {
+        if (enable) {
+            sounds.music.loop = true;
+            sounds.music.play();
+        }
+        else {
+            sounds.music.pause();
+        }
+    },
+
+    typing: new Audio("sfx/typing.mp3"),
+
+    // Turn typing sounds on or off:
+    setTyping: function(enable) {
+        if (enable) {
+            sounds.typing.loop = true;
+            sounds.typing.play();
+        }
+        else {
+            sounds.typing.pause();
+        }
+    }
+};

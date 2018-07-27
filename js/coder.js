@@ -96,6 +96,8 @@ class Coder {
     // Inject coffee, altering coder's stats:
     addCoffee(coffee) {
         console.info('Add', coffee);
+        sounds.play('slurp');
+
         this.caffeine += coffee.strength / 8;
         this.caffeine = Math.min(1, this.caffeine);
         this.tolerance += 0.03;

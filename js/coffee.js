@@ -130,6 +130,7 @@ class CoffeeMachine {
             document.body.style.cursor = 'default';
         })
         .on('click', () => {
+            sounds.play('coin');
             this.openMenu();
         });
 
@@ -190,8 +191,7 @@ class CoffeeMachine {
         console.log("Selected", coffees[index].name);
         // Block menu:
         this.brewing = true;
-        // TODO: play sound
-
+        sounds.play('machine');
         // Play animation:
         this.jiggle();
         setTimeout(function() {
