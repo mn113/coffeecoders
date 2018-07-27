@@ -41,7 +41,8 @@ function gameOver(result) {
     if (result == 'lost') {
         showMessage({
             heading: "Game Over",
-            subtext: "The project was not delivered on time.",
+            subtext: `The project was not delivered on time.
+${100 * GAME.caffeineConsumed}mg of caffeine were consumed.`,
             button: {
                 text: "Retry",
                 action: function() {
@@ -55,7 +56,9 @@ function gameOver(result) {
     else if (result == 'won') {
         showMessage({
             heading: "Hurrah!",
-            subtext: "The project was completed on time and can be shipped! (You beat the game!)\nBest of luck in your next endeavour.",
+            subtext: `The project was completed on time and can be shipped! (You beat the game!)
+${100 * GAME.caffeineConsumed}mg of caffeine were consumed.
+Best of luck in your next endeavour.`,
             autoCancel: false
         });
         sounds.play('triumph');
@@ -119,7 +122,7 @@ function showMessage(options) {
 function makeButton(options) {
     var button = new Konva.Label({
         x: 210,
-        y: 180
+        y: 190
     });
     var tag = new Konva.Tag({
         width: 60,

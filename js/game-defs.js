@@ -17,7 +17,8 @@ var GAME = {
         {coders: 10, target: {loc: 5750, bugs: 600}, timeBoost: 10},
         {coders: 11, target: {loc: 6200, bugs: 550}, timeBoost: 5},
         {coders: 12, target: {loc: 7000, bugs: 700}, timeBoost: 0}
-    ]
+    ],
+    caffeineConsumed: 0
 };
 
 function loadLevel(n) {

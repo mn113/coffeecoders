@@ -98,6 +98,7 @@ class Coder {
         console.info('Add', coffee);
         sounds.play('slurp');
 
+        GAME.caffeineConsumed += coffee.strength;
         this.caffeine += coffee.strength / 8;
         this.caffeine = Math.min(1, this.caffeine);
         this.tolerance += 0.03;
