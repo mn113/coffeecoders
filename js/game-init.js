@@ -22,7 +22,7 @@ function play() {
             pause();
             if (GAME.level === 10) gameOver('won');
             else {
-                updateMiniMessage(`Level ${GAME.level + 1} passed!`, 'salmon');
+                updateMiniMessage(`Level ${GAME.level + 1} passed!`, 'limegreen');
                 showMessage({
                     heading: `Level ${GAME.level + 1} passed!`,
                     subtext: '😎 A new coder joins the team...',

@@ -96,9 +96,14 @@ class Coder {
                 me.unhighlight();
             }
         }).on('click', function() {
-            if (GAME.activeTool == 'code') me.mode = 'coding';
-            else if (GAME.activeTool == 'fixbugs') me.mode = 'fixing';
-            else if (GAME.activeTool == 'sleep') me.mode = 'sleeping';
+            if (GAME.activeTool == 'code') {
+                me.mode = 'coding';
+                updateMiniMessage(`${me.fname} is on coding`, 'salmon');
+            }
+            else if (GAME.activeTool == 'fixbugs') {
+                me.mode = 'fixing';
+                updateMiniMessage(`${me.fname} is on bugfixing`, 'salmon');
+            }
             highlightMenu(0);
         })
         .on('dragenter', function() {
@@ -241,12 +246,12 @@ class Coder {
     }
 
     writeBugs() {
-        GAME.bugs += Math.round(this.caffeine * (3 + Math.random() * 6));
+        GAME.bugs += Math.round(this.caffeine * (6 + Math.random() * 8));
         this.screen.writeBug();
     }
 
     fixBug() {
-        GAME.bugs -= Math.round(this.caffeine * (4 + Math.random() * 4));
+        GAME.bugs -= Math.round(this.caffeine * (8 + Math.random() * 4));
         GAME.bugs = Math.max(GAME.bugs, 0);
         this.screen.fixBug();
     }
@@ -277,7 +282,7 @@ class Coder {
             this.craving = null;
             this.bubble.hide();
             fgLayer.draw();
-        }, 3000 + 1000 * Math.random());
+        }, 3500 + 1000 * Math.random());
     }
 
     addCoffee(coffee) {
@@ -291,16 +296,16 @@ class Coder {
         // Affect coder stats (more if preference matched):
         if (coffee.index === this.coffeePreference) {
             sounds.play(this.sex == 'male' ? 'mmmhis' : 'mmmhers');
-            this.caffeine += coffee.strength / 4;
+            this.caffeine += coffee.strength / 3;
             this.tolerance += 0.03;
             this.falloff -= 0.03;    
         }
         else {
-            this.caffeine += coffee.strength / 6;
+            this.caffeine += coffee.strength / 5;
             this.tolerance += 0.02;
             this.falloff -= 0.02;    
         }
-        this.caffeine = Math.min(1, this.caffeine);
+        this.caffeine = Math.min(0.999, this.caffeine);
 
         this.toDrink = coffee.strength;
         // Drink it then reset craving:

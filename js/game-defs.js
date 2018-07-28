@@ -247,14 +247,14 @@ function updateScores() {
 var sounds = {
     coin:     {url: "sfx/coin.mp3", volume: 0.6},
     machine:  {url: "sfx/machine-pour-ping.mp3", volume: 1},
-    slurp:    {url: "sfx/slurp.mp3", volume: 0.5},
+    slurp:    {url: "sfx/slurp.mp3", volume: 0.8},
     powerup:  {url: "sfx/powerup.mp3", volume: 0.5},
     sugar:    {url: "sfx/sugar.mp3", volume: 0.5},
-    mmmhis:   {url: "sfx/mmm-his.mp3", volume: 0.75},
+    mmmhis:   {url: "sfx/mmm-his.mp3", volume: 1},
     mmmhers:  {url: "sfx/mmm-hers.mp3", volume: 1},
     levelup:  {url: "sfx/powerup.mp3", volume: 0.5},
     gameover: {url: "sfx/gameover.mp3", volume: 0.5},
-    triumph:  {url: "sfx/triumph.mp3", volume: 0.5},
+    triumph:  {url: "sfx/triumph.mp3", volume: 0.6},
     extinguisher: {url: "sfx/extinguisher.mp3", volume: 1},
 
     // Create and play a one-off sound effect:
