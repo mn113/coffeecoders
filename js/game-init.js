@@ -6,7 +6,7 @@ function play() {
         }
         updateScores();
 
-        if (GAME.treatTable === null && Math.random() > 0.9) {
+        if (GAME.activeTreat === null && Math.random() > 0.9) {
             displayRandomTreat();
         }
     
@@ -41,6 +41,9 @@ function pause() {
 }
 
 function gameOver(result) {
+    sounds.setMusic(false);
+    sounds.setTyping(false);
+
     if (result == 'lost') {
         showMessage({
             heading: "Game Over",
@@ -173,8 +176,8 @@ showMessage({
             menuLayer.draw();
             loadLevel(0);
             sounds.play('coin');
-            //sounds.setMusic(true);
-            //sounds.setTyping(true);
+            sounds.setMusic(true);
+            sounds.setTyping(true);
             play();
         }
     },

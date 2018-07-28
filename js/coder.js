@@ -9,14 +9,12 @@ Array.prototype.pluck = function() {
     return this.splice(index, 1)[0];
 }
 
-const names = {   // need 12 of each
-    male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo", "George", "Elliott"],
-    female: ["Aroma", "Illy", "Jo", "Flo", "Cath", "Maureen", "Heather", "Steamy"],
+const names = {   // need 12 of each (9 ok!)
+    male: ["Egbert", "Franck", "Joe", "Chi-Bo", "Phil", "Fredo", "George", "Elliott", "Zak"],
+    female: ["Aroma", "Illy", "Jo", "Flo", "Cath", "Maureen", "Heather", "Steamy", "Barbara"],
     last: ["Neska-Fay", "Lavatsa", "Schlurpp", "Stahbux", "Bean", "Nero",
             "Q. Rigg", "Macupp", "Black", "Press", "Robusta", "DiCaff"]
 };
-
-const modes = ['💤']
 
 class Coder {
     constructor(pos) {
@@ -31,7 +29,7 @@ class Coder {
         this.tolerance = 0.3 + Math.random() * 0.4;
         this.falloff = 0.3 + Math.random() * 0.4;
         this.coffeePreference = Math.floor(Math.random() * 7);  // index of coffees
-        this.craving = null;    // can be a coffee or a food
+        this.craving = null;    // can be a coffee or a treat
         this.toDrink = 0;       // empty cup
         this.konvaImg = null;   // Konva shape
         // Attach a new screen to each coder:
@@ -40,88 +38,15 @@ class Coder {
         this.render();
     }
 
+    // Utility logger 1:
     toString() {
         return `${this.fname} @ (${this.pos.x},${this.pos.y}):
                 caf=${this.caffeine}, tol=${this.tolerance}, fal=${this.falloff}, mode=${this.mode}`;
     }
 
+    // Utility logger 2:
     log() {
         console.log(this.toString());        
-    }
-
-    writeCode() {
-        GAME.loc += Math.ceil(10 * this.caffeine);
-        this.screen.writeCode();
-    }
-
-    writeBugs() {
-        GAME.bugs += Math.ceil(0.5 * this.caffeine);
-        this.screen.writeBug();
-    }
-
-    fixBug() {
-        GAME.bugs -= Math.ceil(2 * this.caffeine);
-        GAME.bugs = Math.max(GAME.bugs, 0);
-        this.screen.fixBug();
-    }
-
-    sleep() {
-        this.sleepNeeded--;
-        this.screen.sleep();
-    }
-
-    wantCoffee() {
-        var coffee = coffees[this.coffeePreference];
-        this.craving = coffee;
-        this.updateBubble('☕');
-        this.bubble.show();
-        fgLayer.draw();
-        console.log(`${this.fname} wants a ${coffee.name}`);
-    }
-
-    wantSugar() {
-        var treat = foods.random();
-        this.craving = treat;
-        this.updateBubble(treat.icon);
-        this.bubble.show();
-        fgLayer.draw();
-        console.log(`${this.fname} wants a ${treat.name}`);
-        // Time it out:
-        setTimeout(() => {
-            this.craving = null;
-            this.bubble.hide();
-            fgLayer.draw();
-        }, 3000 + 1000 * Math.random());
-    }
-
-    // Inject coffee, altering coder's stats:
-    addCoffee(coffee) {
-        console.info('Add', coffee);
-        sounds.play('slurp');
-
-        GAME.caffeineConsumed += coffee.strength;
-        this.caffeine += coffee.strength / 8;
-        this.caffeine = Math.min(1, this.caffeine);
-        this.tolerance += 0.03;
-        this.falloff -= 0.03;
-        // TODO: render cup on desk?
-        this.toDrink = coffee.strength;
-        setTimeout(() => {
-            this.craving = null;
-        }, 1000 * coffee.strength);
-    }
-
-    // Give coder a donut/pastry/cookie:
-    addSugar(type) {
-        console.info('Sugar', type);
-        sounds.play('sugar');
-        if (type == this.craving) {
-            // Stats boost
-            this.tolerance += 0.2;
-            this.falloff -= 0.2;
-            this.fixBug();
-        }
-        this.craving = null;
     }
 
     // Render the coder's face (run once):
@@ -131,7 +56,7 @@ class Coder {
         imageObj.src = me.imgUrl;
         imageObj.onload = function() {
             me.konvaImg = new Konva.Image({
-                name: 'coder',
+                name: 'coder ' + me.fname,
                 image: imageObj,
                 x: me.pos.x,
                 y: me.pos.y,
@@ -184,14 +109,14 @@ class Coder {
         })
         .on('drop', function() {
             // Was it a coffee or a treat?
-            console.log(tempLayer.children);    // Konva.Collection [0]
-            console.log(`Dropped ${activeCoffee.name} on ${me.fname}`);
-            me.addCoffee(activeCoffee);
+            //console.log(tempLayer.children);    // Konva.Collection [0]
+            //console.log(`Dropped ${GAME.activeCoffee.name} on ${me.fname}`);
+            //me.addCoffee(GAME.activeCoffee);
             // Destroy coffee
-            activeCoffee.coffeeObj.destroy();   // FIXME
-            activeCoffee = null;
-            fgLayer.draw();
-            coffeeLayer.draw();
+            //GAME.activeCoffee.coffeeObj.destroy();   // FIXME:
+            //GAME.activeCoffee = null;
+            //fgLayer.draw();
+            //coffeeLayer.draw();
         });
     }
 
@@ -285,6 +210,80 @@ class Coder {
         this.caffBar.draw();
     }
 
+        /*
+     * Screen-based methods:
+     */
+    writeCode() {
+        GAME.loc += Math.ceil(10 * this.caffeine);
+        this.screen.writeCode();
+    }
+
+    writeBugs() {
+        GAME.bugs += Math.ceil(0.5 * this.caffeine);
+        this.screen.writeBug();
+    }
+
+    fixBug() {
+        GAME.bugs -= Math.ceil(2 * this.caffeine);
+        GAME.bugs = Math.max(GAME.bugs, 0);
+        this.screen.fixBug();
+    }
+
+    /*
+     * Coffee & Treat-based methods:
+     */
+    wantCoffee() {
+        var coffee = coffees[this.coffeePreference];
+        this.craving = coffee;
+        this.updateBubble('☕');
+        this.bubble.show();
+        fgLayer.draw();
+        console.log(`${this.fname} wants a ${coffee.name}`);
+    }
+
+    wantSugar() {
+        var treat = treats.random();
+        this.craving = treat;
+        this.updateBubble(treat.icon);
+        this.bubble.show();
+        fgLayer.draw();
+        console.log(`${this.fname} wants a ${treat.name}`);
+        // Time it out:
+        setTimeout(() => {
+            this.craving = null;
+            this.bubble.hide();
+            fgLayer.draw();
+        }, 3000 + 1000 * Math.random());
+    }
+
+    addCoffee(coffee) {
+        console.info('Add', coffee);
+        sounds.play('slurp');
+
+        GAME.caffeineConsumed += coffee.strength;
+        this.caffeine += coffee.strength / 8;
+        this.caffeine = Math.min(1, this.caffeine);
+        this.tolerance += 0.03;
+        this.falloff -= 0.03;
+        // TODO: render cup on desk?
+        this.toDrink = coffee.strength;
+        setTimeout(() => {
+            this.craving = null;
+        }, 1000 * coffee.strength);
+    }
+
+    addSugar(treat) {
+        console.info('Sugar', treat);
+        sounds.play('sugar');
+        if (treat.name == this.craving.name) {
+            // Stats boost
+            this.tolerance += 0.2;
+            this.falloff -= 0.2;
+            this.fixBug();
+        }
+        this.craving = null;
+    }
+
     // Lighten image:
     highlight() {
         this.konvaImg.cache();
@@ -302,8 +301,6 @@ class Coder {
     
     // Update the coder's stats & re-render stuff on every game tick:
     tick() {
-        // TODO: if sleeping, return early
-
         switch (this.mode) {
             case 'coding':
                 this.writeCode();
@@ -312,10 +309,6 @@ class Coder {
             
             case 'fixing':
                 this.fixBug();
-                break;
-
-            case 'sleeping':
-                this.sleep();
                 break;
         }
         // Use up available coffee:

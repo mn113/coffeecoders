@@ -1,7 +1,6 @@
 // Creates a screen with code on it
 class Screen {
     constructor(coderPos) {
-        console.log("new Screen @", coderPos);
         this.x = coderPos.x - 10;
         this.y = coderPos.y - 4;
         

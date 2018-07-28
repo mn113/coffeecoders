@@ -1,5 +1,7 @@
 var GAME = {
     activeTool: null,
+    activeCoffee: null,
+    activeTreat: null,
     loc: 0,
     bugs: 0,
     timeLeft: 0,
@@ -18,8 +20,7 @@ var GAME = {
         {coders: 11, target: {loc: 6200, bugs: 550}, timeBoost: 5},
         {coders: 12, target: {loc: 7000, bugs: 700}, timeBoost: 0}
     ],
-    caffeineConsumed: 0,
-    treatTable: null
+    caffeineConsumed: 0
 };
 
 function loadLevel(n) {
@@ -246,7 +247,6 @@ var sounds = {
     // Create and play a one-off sound effect:
 	play: function(name) {
         var player = new Audio(sounds[name]);
-        console.log(player);
         player.volume = 0.5;
 		player.play();  // will be stopped and garbage-collected when audio ends
     },
@@ -281,7 +281,7 @@ var sounds = {
 var musicCredit = new Konva.Text({
     x: 42,
     y: 292,
-    text: '♬ Lee Rosewarne - Telecom',
+    text: '♬ Lee Rosevere - Telecom',
     fill: '#C0FFEE',
     fontSize: 6
 });

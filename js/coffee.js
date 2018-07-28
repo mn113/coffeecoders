@@ -1,6 +1,6 @@
 var coffeeMenuOrigin = {x: 90, y: 70};
 var coffeeBrewOrigin = {x: 90, y: 90};
-var activeCoffee = null;
+var treatOrigin = {x: 300, y: 72};
 
 const coffees = [
     {name: 'Americano', strength: 0.8, img: 'img/coffees/americano.png'},
@@ -12,32 +12,63 @@ const coffees = [
     {name: 'Double Espresso', strength: 2, img: 'img/coffees/espresso-doppio.png'}
 ];
 
-const foods = [
+const treats = [
     {name: 'Donut', icon: '🍩'},
     {name: 'Croissant', icon: '🥐'},
     {name: 'Cookie', icon: '🍪'}
 ];
 
 function displayRandomTreat() {
-    var treat = foods.random();
-    console.log('Random', treat.name, treat.icon, "appeared.");
-    GAME.treatTable = new Konva.Text({
-        x: 300,
-        y: 72,
-        width: 24,
-        height: 18,
-        fontSize: 16,
-        text: treat.icon,
-        draggable: true
-    });
-    coffeeLayer.add(GAME.treatTable);
-    coffeeLayer.draw();
-    // Remove after a while:
-    setTimeout(function() {
-        GAME.treatTable.destroy();
-        GAME.treatTable = null;
+    GAME.activeTreat = new Treat(Math.floor(Math.random() * 3));
+}
+
+// Load a treat sprite, for dragging to coders, remove after 5 sec:
+class Treat {
+    constructor(index) {
+        this.name = treats[index].name;
+        this.icon = treats[index].icon;
+        this.treatObj = null;
+        this.index = index;
+        this.origin = treatOrigin;
+
+        this.render();      
+        this.makeTemporary();
+
+        GAME.activeTreat = this;
+        console.log("Loaded 1", this.name);
+    }
+
+    render() {
+        this.treatObj = new Konva.Text({
+            x: treatOrigin.x,
+            y: treatOrigin.y,
+            width: 24,
+            height: 18,
+            fontSize: 16,
+            text: this.icon,
+            name: 'treat ' + this.name,
+            draggable: true
+        });
+        coffeeLayer.add(this.treatObj);
         coffeeLayer.draw();
-    }, 5000);
+    }
+
+    makeTemporary() {
+        var me = this;
+        // Remove after a while:
+        setTimeout(function() {
+            me.treatObj.destroy();
+            GAME.activeTreat = null;
+            coffeeLayer.draw();
+        }, 5000);
+    }
+
+    springBack() {
+        this.treatObj.x(this.origin.x);
+        this.treatObj.y(this.origin.y);
+        coffeeLayer.draw();
+        console.log("Sproing!");
+    }
 }
 
 // Load a coffee sprite, either for the menu system or for dragging to coders:
@@ -49,6 +80,7 @@ class Coffee {
         this.coffeeObj = null;
         this.index = index;
         this.isMenu = isMenu;
+        this.origin = (isMenu) ? coffeeMenuOrigin : coffeeBrewOrigin;
 
         this.render();      
         console.log("Loaded 1", this.name);
@@ -61,7 +93,7 @@ class Coffee {
         img.onload = function() {
             me.coffeeObj = new Konva.Image({
                 image: img,
-                name: this.name,
+                name: 'coffee ' + me.name,
                 x: coffeeMenuOrigin.x,
                 y: coffeeMenuOrigin.y,
                 offset: {
@@ -115,7 +147,7 @@ class Coffee {
                 document.body.style.cursor = 'pointer';
             })
             .on('dragstart', function() {
-                activeCoffee = me;
+                GAME.activeCoffee = me;
                 coffeeLayer.draw();
             })
             .on('dragend', function() {
@@ -124,8 +156,16 @@ class Coffee {
             });
         }
     }
+
+    springBack() {
+        this.coffeeObj.x(this.origin.x);
+        this.coffeeObj.y(this.origin.y);
+        coffeeLayer.draw();
+        console.log("Sproing!");
+    }
 }
 
+// Load the one coffee machine with its functions:
 class CoffeeMachine {
     constructor() {
         // Re-use the background, to avoid an extra coffee machine graphic:
