@@ -19,7 +19,7 @@ function play() {
             if (GAME.level === 10) gameOver('won');
             else {
                 showMessage({
-                    heading: 'Level passed!',
+                    heading: `Level ${GAME.level + 1} passed!`,
                     subtext: 'A new coder joins the team...',
                     autoCancel: true
                 });

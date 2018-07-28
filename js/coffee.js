@@ -48,6 +48,16 @@ class Treat {
             text: this.icon,
             name: 'treat ' + this.name,
             draggable: true
+        })
+        .on('mouseover', function() {
+            document.body.style.cursor = 'move';
+        })
+        .on('mouseout', function() {
+            document.body.style.cursor = 'pointer';
+        })
+        .on('dragstart', function() {
+            // co-handled elsewhere
+            coffeeLayer.draw();
         });
         coffeeLayer.add(this.treatObj);
         coffeeLayer.draw();
@@ -128,10 +138,17 @@ class Coffee {
         // Conditional interactivity:
         if (this.isMenu) {
             this.coffeeObj.opacity(0);
+            this.coffeeObj.listening(false);
             this.coffeeObj.on('click', function() {
-                if (!coffeeMachine.brewing) {
+                if (coffeeMachine.brewing) {
+                    // do nothing
+                }
+                if (coffeeMachine.menuOpen) {
                     coffeeMachine.selectCoffee(this.index);
                     coffeeMachine.closeMenu();
+                }
+                else {
+                    coffeeMachine.openMenu();
                 }
             });
         }
@@ -147,12 +164,12 @@ class Coffee {
                 document.body.style.cursor = 'pointer';
             })
             .on('dragstart', function() {
+                // co-handled elsewhere
                 GAME.activeCoffee = me;
                 coffeeLayer.draw();
             })
             .on('dragend', function() {
-                //TODO: check for intersection with coder, if not, springback
-
+                // handled elsewhere
             });
         }
     }
@@ -168,7 +185,6 @@ class Coffee {
 // Load the one coffee machine with its functions:
 class CoffeeMachine {
     constructor() {
-        // Re-use the background, to avoid an extra coffee machine graphic:
         var img = new Image();
         img.src = `img/coffeemachine.png`;
         img.onload = function() {
@@ -187,19 +203,25 @@ class CoffeeMachine {
         // Attach machine behaviour:
         this.machineObj
         .on('mouseover', () => {
-            document.body.style.cursor = 'pointer';
+            if (!this.brewing && !this.menuOpen) {
+                document.body.style.cursor = 'pointer';
+            }
         })
         .on('mouseout', () => {
             document.body.style.cursor = 'default';
         })
         .on('click', () => {
-            sounds.play('coin');
-            this.openMenu();
+            console.log("clicked machine", this.brewing, this.menuOpen);
+            if (!this.brewing && !this.menuOpen) {
+                sounds.play('coin');
+                this.openMenu();
+            }
         });
 
         // Store the coffees here:
         this.icons = [];
         this.brewing = false;
+        this.menuOpen = false;
 
         //machineLayer.add(this.hitRegion, this.shape);
 
@@ -226,10 +248,12 @@ class CoffeeMachine {
                 y: positions[i].y,
                 opacity: 1,
                 duration: 1,
-                easing: Konva.Easings.EaseOut
+                easing: Konva.Easings.EaseOut,
+                listening: true
             });
             tween.play();
         }
+        this.menuOpen = true;
         coffeeLayer.draw();
     }
 
@@ -242,15 +266,18 @@ class CoffeeMachine {
                 y: coffeeMenuOrigin.y,
                 opacity: 0,
                 duration: 1,
-                easing: Konva.Easings.EaseOut
+                easing: Konva.Easings.EaseOut,
+                listening: false
             });
             tween.play();
         }
+        this.menuOpen = false;
         coffeeLayer.draw();
     }
 
     // Generate a coffee to be dragged out:
     selectCoffee(index) {
+        var me = this;
         console.log("Selected", coffees[index].name);
         // Block menu:
         this.brewing = true;
@@ -259,7 +286,7 @@ class CoffeeMachine {
         this.jiggle();
         setTimeout(function() {
             new Coffee(index, false);
-            this.brewing = false;
+            me.brewing = false;
         }, 2000);
     }
 
