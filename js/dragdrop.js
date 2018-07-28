@@ -2,10 +2,10 @@
 // They will be moved to tempLayer during the interaction
 // All droppables will exist on fgLayer
 // TODO: springback & re-layer if no suitable drop target
-// TODO: wire up coder.drop behaviour
 
 var tempLayer = new Konva.Layer();
 stage.add(tempLayer);
+tempLayer.moveDown();   // topmost but one
 
 var previousShape;
 
@@ -96,11 +96,12 @@ stage.on("dragover", function(e){
     console.log('dragover ' + e.target.name());
     fgLayer.draw();
 });
+*/
 
 // Notify when a shape is dropped on (depends on previous definition)
 stage.on("drop", function(e){
-    e.target.fill('red');
     console.log('drop ' + e.target.name());
+    // Check for illegal drop:
+    if (!e.target.hasName('coder')) tempLayer.destroyAllChildren();
     fgLayer.draw();
 });
-*/

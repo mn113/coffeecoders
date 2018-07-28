@@ -3,9 +3,12 @@ function play() {
     GAME.loop = setInterval(() => {
         for (c of coders) {
             c.tick();
-            //c.log();
         }
         updateScores();
+
+        if (GAME.treatTable === null && Math.random() > 0.9) {
+            displayRandomTreat();
+        }
     
         GAME.timeLeft -= 0.25;
         if (GAME.timeLeft * 4 % 4 === 0) console.log(`${GAME.timeLeft} seconds`);
@@ -78,9 +81,9 @@ function showMessage(options) {
     var messageGroup = new Konva.Group();
     var bg = new Konva.Rect({
         x: 120,
-        y: 110,
+        y: 100,
         width: 240,
-        height: 100,
+        height: 120,
         fill: 'white',
         stroke: '#333',
         strokeWidth: 1,
@@ -88,7 +91,7 @@ function showMessage(options) {
     });
     var h1 = new Konva.Text({
         x: 130,
-        y: 120,
+        y: 110,
         width: 220,
         align: 'center',
         fontSize: 20,
@@ -97,7 +100,7 @@ function showMessage(options) {
     });
     var p = new Konva.Text({
         x: 130,
-        y: 150,
+        y: 140,
         width: 220,
         align: 'center',
         fontSize: 12,
@@ -122,7 +125,7 @@ function showMessage(options) {
 function makeButton(options) {
     var button = new Konva.Label({
         x: 210,
-        y: 190
+        y: 180
     });
     var tag = new Konva.Tag({
         width: 60,

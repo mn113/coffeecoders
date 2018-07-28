@@ -61,6 +61,7 @@ class Coder {
 
     fixBug() {
         GAME.bugs -= Math.ceil(2 * this.caffeine);
+        GAME.bugs = Math.max(GAME.bugs, 0);
         this.screen.fixBug();
     }
 
@@ -72,7 +73,7 @@ class Coder {
     wantCoffee() {
         var coffee = coffees[this.coffeePreference];
         this.craving = coffee;
-        this.updateBubble(this.coffeePreference);
+        this.updateBubble('☕');
         this.bubble.show();
         fgLayer.draw();
         console.log(`${this.fname} wants a ${coffee.name}`);
@@ -110,6 +111,19 @@ class Coder {
         }, 1000 * coffee.strength);
     }
 
+    // Give coder a donut/pastry/cookie:
+    addSugar(type) {
+        console.info('Sugar', type);
+        sounds.play('sugar');
+        if (type == this.craving) {
+            // Stats boost
+            this.tolerance += 0.2;
+            this.falloff -= 0.2;
+            this.fixBug();
+        }
+        this.craving = null;
+    }
+
     // Render the coder's face (run once):
     render() {
         var me = this;
@@ -117,6 +131,7 @@ class Coder {
         imageObj.src = me.imgUrl;
         imageObj.onload = function() {
             me.konvaImg = new Konva.Image({
+                name: 'coder',
                 image: imageObj,
                 x: me.pos.x,
                 y: me.pos.y,
@@ -168,6 +183,8 @@ class Coder {
             me.unhighlight();
         })
         .on('drop', function() {
+            // Was it a coffee or a treat?
+            console.log(tempLayer.children);    // Konva.Collection [0]
             console.log(`Dropped ${activeCoffee.name} on ${me.fname}`);
             me.addCoffee(activeCoffee);
             // Destroy coffee

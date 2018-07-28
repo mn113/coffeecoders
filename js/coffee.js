@@ -18,6 +18,28 @@ const foods = [
     {name: 'Cookie', icon: '🍪'}
 ];
 
+function displayRandomTreat() {
+    var treat = foods.random();
+    console.log('Random', treat.name, treat.icon, "appeared.");
+    GAME.treatTable = new Konva.Text({
+        x: 300,
+        y: 72,
+        width: 24,
+        height: 18,
+        fontSize: 16,
+        text: treat.icon,
+        draggable: true
+    });
+    coffeeLayer.add(GAME.treatTable);
+    coffeeLayer.draw();
+    // Remove after a while:
+    setTimeout(function() {
+        GAME.treatTable.destroy();
+        GAME.treatTable = null;
+        coffeeLayer.draw();
+    }, 5000);
+}
+
 // Load a coffee sprite, either for the menu system or for dragging to coders:
 class Coffee {
     constructor(index, isMenu = false) {
@@ -98,6 +120,7 @@ class Coffee {
             })
             .on('dragend', function() {
                 //TODO: check for intersection with coder, if not, springback
+
             });
         }
     }
