@@ -8,17 +8,17 @@ var GAME = {
     target: {},
     level: 0,
     levels: [
-        {coders: 2, target: {loc: 500, bugs: 450}, timeBoost: 45},
-        {coders: 3, target: {loc: 750, bugs: 425}, timeBoost: 30},
-        {coders: 4, target: {loc: 1050, bugs: 400}, timeBoost: 25},
-        {coders: 5, target: {loc: 1350, bugs: 370}, timeBoost: 20},
-        {coders: 6, target: {loc: 1650, bugs: 400}, timeBoost: 20},
-        {coders: 7, target: {loc: 1900, bugs: 440}, timeBoost: 15},
-        {coders: 8, target: {loc: 2250, bugs: 475}, timeBoost: 15},
-        {coders: 9, target: {loc: 2500, bugs: 525}, timeBoost: 10},
-        {coders: 10, target: {loc: 5750, bugs: 600}, timeBoost: 10},
-        {coders: 11, target: {loc: 6200, bugs: 550}, timeBoost: 5},
-        {coders: 12, target: {loc: 7000, bugs: 700}, timeBoost: 0}
+        {coders: 2, target: {loc: 500, bugs: 350}, timeBoost: 45},
+        {coders: 3, target: {loc: 850, bugs: 400}, timeBoost: 30},
+        {coders: 4, target: {loc: 1250, bugs: 425}, timeBoost: 25},
+        {coders: 5, target: {loc: 1750, bugs: 450}, timeBoost: 25},
+        {coders: 6, target: {loc: 2400, bugs: 500}, timeBoost: 20},
+        {coders: 7, target: {loc: 3150, bugs: 575}, timeBoost: 20},
+        {coders: 8, target: {loc: 4000, bugs: 625}, timeBoost: 15},
+        {coders: 9, target: {loc: 5000, bugs: 700}, timeBoost: 12},
+        {coders: 10, target: {loc: 6000, bugs: 675}, timeBoost: 10},
+        {coders: 11, target: {loc: 7000, bugs: 650}, timeBoost: 5},
+        {coders: 12, target: {loc: 8000, bugs: 625}, timeBoost: 5}
     ],
     caffeineConsumed: 0
 };
@@ -34,12 +34,6 @@ function loadLevel(n) {
     }
     scoreLayer.draw();
     fgLayer.draw();
-
-    /*showMessage({
-        heading: `Level ${n+1}`,
-        subtext: "",
-        autoCancel: true
-    });*/
 }
 
 // Set up Konva:
@@ -235,19 +229,19 @@ function updateScores() {
 
 // Sounds:
 var sounds = {
-    coin: "sfx/coin.mp3",   // ok
-    machine: "sfx/machine-pour-ping.mp3",   // ok
-    slurp: "sfx/slurp.mp3", // ok
-    powerup: "sfx/powerup.mp3", // ok (to wire...)
-    sugar: "sfx/sugar.mp3", // ok (to wire...)
-    levelup: "sfx/powerup.mp3",  // ok
-    gameover: "sfx/gameover.mp3",   // ok
-    triumph: "sfx/triumph.mp3", // ok
+    coin:     {url: "sfx/coin.mp3", volume: 0.6},
+    machine:  {url: "sfx/machine-pour-ping.mp3", volume: 1},
+    slurp:    {url: "sfx/slurp.mp3", volume: 0.5},
+    powerup:  {url: "sfx/powerup.mp3", volume: 0.5},
+    sugar:    {url: "sfx/sugar.mp3", volume: 0.5},
+    levelup:  {url: "sfx/powerup.mp3", volume: 0.5},
+    gameover: {url: "sfx/gameover.mp3", volume: 0.5},
+    triumph:  {url: "sfx/triumph.mp3", volume: 0.5},
 
     // Create and play a one-off sound effect:
 	play: function(name) {
-        var player = new Audio(sounds[name]);
-        player.volume = 0.5;
+        var player = new Audio(sounds[name].url);
+        player.volume = sounds[name].volume;
 		player.play();  // will be stopped and garbage-collected when audio ends
     },
 
@@ -257,6 +251,7 @@ var sounds = {
     setMusic: function(enable) {
         if (enable) {
             sounds.music.loop = true;
+            sounds.music.volume = 0.4;
             sounds.music.play();
         }
         else {
@@ -270,6 +265,7 @@ var sounds = {
     setTyping: function(enable) {
         if (enable) {
             sounds.typing.loop = true;
+            sounds.music.volume = 0.5;
             sounds.typing.play();
         }
         else {

@@ -210,21 +210,21 @@ class Coder {
         this.caffBar.draw();
     }
 
-        /*
+    /*
      * Screen-based methods:
      */
     writeCode() {
-        GAME.loc += Math.ceil(10 * this.caffeine);
+        GAME.loc += Math.round(this.caffeine * (13 + Math.random() * 4));
         this.screen.writeCode();
     }
 
     writeBugs() {
-        GAME.bugs += Math.ceil(0.5 * this.caffeine);
+        GAME.bugs += Math.round(this.caffeine * (3 + Math.random() * 6));
         this.screen.writeBug();
     }
 
     fixBug() {
-        GAME.bugs -= Math.ceil(2 * this.caffeine);
+        GAME.bugs -= Math.round(this.caffeine * (4 + Math.random() * 4));
         GAME.bugs = Math.max(GAME.bugs, 0);
         this.screen.fixBug();
     }
@@ -260,8 +260,8 @@ class Coder {
         console.info('Add', coffee);
         sounds.play('slurp');
 
-        GAME.caffeineConsumed += coffee.strength;
-        this.caffeine += coffee.strength / 8;
+        GAME.caffeineConsumed += coffee.strength * 50;  // based on 50mg of caffeine in single espresso shot
+        this.caffeine += coffee.strength / 4;
         this.caffeine = Math.min(1, this.caffeine);
         this.tolerance += 0.03;
         this.falloff -= 0.03;
