@@ -84,7 +84,7 @@ class Coder {
             var shape = evt.target;
             if (shape.className == 'Image') {
                 document.body.style.cursor = 'pointer';
-                console.log(me);
+                //console.log(me);
                 me.nameLabel.show();
                 me.highlight();
             }
@@ -155,8 +155,8 @@ class Coder {
         // Add a tag (the speech bubble itself) to the label:
         this.bubble.add(new Konva.Tag({
             width: 20,
-            height: 20,
-            fill: '#eee',
+            height: 22,
+            fill: '#ddd',   // makes white coffee stand out
             stroke: '#333',
             strokeWidth: 1,
             shadowColor: 'black',
@@ -260,6 +260,7 @@ class Coder {
         this.updateBubble(coffee);
         this.bubble.show();
         fgLayer.draw();
+        updateMiniMessage(`${this.fname} wants a ${coffee.name}`, '#C0FFEE');
         console.log(`${this.fname} wants a ${coffee.name}`);
     }
 
@@ -269,6 +270,7 @@ class Coder {
         this.updateBubble(treat);
         this.bubble.show();
         fgLayer.draw();
+        updateMiniMessage(`${this.fname} wants a ${treat.name}`, '#C0FFEE');
         console.log(`${this.fname} wants a ${treat.name}`);
         // Time it out:
         setTimeout(() => {
@@ -288,6 +290,7 @@ class Coder {
 
         // Affect coder stats (more if preference matched):
         if (coffee.index === this.coffeePreference) {
+            sounds.play(this.sex == 'male' ? 'mmmhis' : 'mmmhers');
             this.caffeine += coffee.strength / 4;
             this.tolerance += 0.03;
             this.falloff -= 0.03;    
@@ -318,7 +321,8 @@ class Coder {
         // Benefits:
         this.writeCode();
         this.fixBug();
-        if (treat.name == this.craving.name) {
+        if (this.craving && this.craving.name == treat.name) {
+            sounds.play(this.sex == 'male' ? 'mmmhis' : 'mmmhers');
             // Stats boost
             this.tolerance += 0.25;
             this.falloff -= 0.25;
@@ -362,8 +366,8 @@ class Coder {
 
         // Initialise new food/drink craving?
         if (!this.craving) {
-            if (this.toDrink <= 0 && this.caffeine < 0.333 && Math.random() > 0.9) this.wantCoffee();
-            else if (Math.random() > 0.975) this.wantSugar();
+            if (Math.random() > 0.975) this.wantSugar();
+            else if (this.toDrink <= 0 && this.caffeine < 0.333 && Math.random() > 0.925) this.wantCoffee();
         }
     }
 }

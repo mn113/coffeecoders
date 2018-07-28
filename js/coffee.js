@@ -295,7 +295,7 @@ class CoffeeMachine {
         setTimeout(function() {
             new Coffee(index, false);
             me.brewing = false;
-        }, 2000);
+        }, 2500);
     }
 
     jiggle() {

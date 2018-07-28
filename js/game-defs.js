@@ -8,25 +8,41 @@ var GAME = {
     target: {},
     level: 0,
     levels: [
-        {coders: 2, target: {loc: 500, bugs: 350}, timeBoost: 45},
-        {coders: 3, target: {loc: 850, bugs: 400}, timeBoost: 30},
-        {coders: 4, target: {loc: 1250, bugs: 425}, timeBoost: 25},
-        {coders: 5, target: {loc: 1750, bugs: 450}, timeBoost: 25},
-        {coders: 6, target: {loc: 2400, bugs: 500}, timeBoost: 20},
-        {coders: 7, target: {loc: 3150, bugs: 575}, timeBoost: 20},
-        {coders: 8, target: {loc: 4000, bugs: 625}, timeBoost: 15},
-        {coders: 9, target: {loc: 5000, bugs: 700}, timeBoost: 12},
-        {coders: 10, target: {loc: 6000, bugs: 675}, timeBoost: 10},
-        {coders: 11, target: {loc: 7000, bugs: 650}, timeBoost: 5},
-        {coders: 12, target: {loc: 8000, bugs: 625}, timeBoost: 5}
+        {coders: 2, target: {loc: 750, bugs: 300}, timeBoost: 45},
+        {coders: 3, target: {loc: 1200, bugs: 350}, timeBoost: 30}, // +450
+        {coders: 4, target: {loc: 1700, bugs: 400}, timeBoost: 25}, // +500
+        {coders: 5, target: {loc: 2250, bugs: 450}, timeBoost: 25}, // +550
+        {coders: 6, target: {loc: 2850, bugs: 500}, timeBoost: 20}, // +600
+        {coders: 7, target: {loc: 3500, bugs: 575}, timeBoost: 20}, // +750
+        {coders: 8, target: {loc: 4350, bugs: 650}, timeBoost: 15}, // +850
+        {coders: 9, target: {loc: 5400, bugs: 700}, timeBoost: 15}, // +1050
+        {coders: 10, target: {loc: 6900, bugs: 650}, timeBoost: 10},// +1500
+        {coders: 11, target: {loc: 8500, bugs: 575}, timeBoost: 10}, // +1600
+        {coders: 12, target: {loc: 10000, bugs: 500}, timeBoost: 5} // +1500
     ],
     caffeineConsumed: 0
 };
 
 function loadLevel(n) {
     GAME.level = n;
-    GAME.target = GAME.levels[n].target;
-    GAME.timeLeft = GAME.timeLeft + GAME.levels[n].timeBoost;
+    // Increase loc (preventing multiple jumps ahead):
+    if (GAME.loc > GAME.levels[n].target.loc) {
+        GAME.target.loc = 1000 + 25 * Math.ceil(GAME.loc / 25);
+    }
+    else {
+        GAME.target.loc = GAME.levels[n].target.loc;
+    }
+
+    // Increase bugs:
+    GAME.target.bugs = GAME.levels[n].target.bugs;
+    
+    // Adaptive-difficulty time adding:
+    if (GAME.timeLeft < 45) {
+        GAME.timeLeft = GAME.timeLeft + GAME.levels[n].timeBoost;
+    }
+    else {
+        GAME.timeLeft = GAME.timeLeft + GAME.levels[n].timeBoost / 2;
+    }
     
     // Hire any new coders up to level's amount (typically just 1):
     while (coders.length < GAME.levels[n].coders) {
@@ -50,11 +66,11 @@ var bgLayer = new Konva.Layer();
 var menuLayer = new Konva.Layer();
 var scoreLayer = new Konva.Layer();
 var machineLayer = new Konva.Layer();
-var fgLayer = new Konva.Layer();
 var screensLayer = new Konva.Layer();
+var fgLayer = new Konva.Layer();
 var coffeeLayer = new Konva.Layer();
 var modalLayer = new Konva.Layer();
-stage.add(bgLayer, menuLayer, scoreLayer, machineLayer, fgLayer, screensLayer, coffeeLayer, modalLayer);
+stage.add(bgLayer, menuLayer, scoreLayer, machineLayer, screensLayer, fgLayer, coffeeLayer, modalLayer);
 
 // Background:
 var bgImg = new Image();
@@ -79,9 +95,9 @@ function makeToolMenu() {
     // First:
     var codeImg = new Image();
     codeImg.src = `img/writecode.png`;
-    codeImg.onload = function() {
+/*    codeImg.onload = function() {
         menuLayer.draw();
-    };
+    };*/
     tools.code = new Konva.Group();
     tools.code.add(new Konva.Rect({
         x: 38,
@@ -112,9 +128,9 @@ function makeToolMenu() {
     // Second:
     var fixImg = new Image();
     fixImg.src = `img/fixbugs.png`;
-    fixImg.onload = function() {
+    /*fixImg.onload = function() {
         menuLayer.draw();
-    };
+    };*/
     tools.fixbugs = new Konva.Group();
     tools.fixbugs.add(new Konva.Rect({
         x: 128,
@@ -234,9 +250,12 @@ var sounds = {
     slurp:    {url: "sfx/slurp.mp3", volume: 0.5},
     powerup:  {url: "sfx/powerup.mp3", volume: 0.5},
     sugar:    {url: "sfx/sugar.mp3", volume: 0.5},
+    mmmhis:   {url: "sfx/mmm-his.mp3", volume: 0.75},
+    mmmhers:  {url: "sfx/mmm-hers.mp3", volume: 1},
     levelup:  {url: "sfx/powerup.mp3", volume: 0.5},
     gameover: {url: "sfx/gameover.mp3", volume: 0.5},
     triumph:  {url: "sfx/triumph.mp3", volume: 0.5},
+    extinguisher: {url: "sfx/extinguisher.mp3", volume: 1},
 
     // Create and play a one-off sound effect:
 	play: function(name) {
@@ -300,8 +319,7 @@ var fireExt = new Konva.Rect({
     y: 70,
     width: 8,
     height: 20,
-    fill: 'blue',
-    opacity: 0.3
+    opacity: 0
 });
 bgLayer.add(fireExt);
 fireExt
@@ -314,10 +332,11 @@ fireExt
 .on('click', function() {
     // Remove click region:
     fireExt.destroy();
+    sounds.play('extinguisher');
     // Create foam:
     var foam = new Konva.Group();
     bgLayer.add(foam);
-    for (var f = 0; f < 100; f++) {
+    for (var f = 0; f < 300; f++) {
         foam.add(new Konva.Circle({
             x: 350 + f * Math.random(),
             y: 60 + f * Math.random(),
@@ -339,3 +358,31 @@ fireExt
     GAME.timeLeft += 10;
 });
 
+// Initialise mini messager at bottom of screen:
+var miniMessage = new Konva.Text({
+    x: 240,
+    y: 290,
+    width: 190,
+    fill: '#eee',
+    fontSize: 9,
+    text: "",
+    align: 'right'
+});
+bgLayer.add(miniMessage);
+bgLayer.draw();
+
+// Function for a less obtrusive in-game message:
+function updateMiniMessage(text, colour) {
+    miniMessage.text(text);
+    miniMessage.fill(colour);
+    miniMessage.opacity(1);
+    miniMessage.show();
+    bgLayer.draw();
+    // Fade away:
+    new Konva.Tween({
+        node: miniMessage,
+        opacity: 0,
+        duration: 1.5,
+    }).play();
+}
+updateMiniMessage('Messager ready', 'salmon');

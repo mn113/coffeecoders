@@ -1,9 +1,13 @@
 function play() {
+    sounds.setMusic(true);
+    sounds.setTyping(true);
+
     // Game loop iterates in quarter-second steps to keep load light:
     GAME.loop = setInterval(() => {
         for (c of coders) {
             c.tick();
         }
+        handleRecentKeyInputs();
         updateScores();
 
         if (GAME.activeTreat === null && Math.random() > 0.9) {
@@ -18,6 +22,7 @@ function play() {
             pause();
             if (GAME.level === 10) gameOver('won');
             else {
+                updateMiniMessage(`Level ${GAME.level + 1} passed!`, 'salmon');
                 showMessage({
                     heading: `Level ${GAME.level + 1} passed!`,
                     subtext: '😎 A new coder joins the team...',
@@ -38,16 +43,28 @@ function play() {
 
 function pause() {
     clearInterval(GAME.loop);
-}
 
-function gameOver(result) {
     sounds.setMusic(false);
     sounds.setTyping(false);
 
+    showMessage({
+        heading: "Paused",
+        subtext: "",
+        button: {
+            text: "Resume",
+            action: function() {
+                play();
+            }
+        },
+        autoCancel: false
+    })
+}
+
+function gameOver(result) {
     if (result == 'lost') {
         showMessage({
             heading: "Game Over",
-            subtext: `The project was NOT delivered on time. 🤬\n\n${GAME.caffeineConsumed}mg of caffeine were consumed.`,
+            subtext: `The project was NOT delivered on time.\n\n${GAME.caffeineConsumed}mg of caffeine were consumed.`,
             button: {
                 text: "Retry",
                 action: function() {
@@ -68,7 +85,7 @@ function gameOver(result) {
     }
 }
 
-/* Options {
+/* Message Options {
     heading: String,
     subtext: String,
     button: Object,
@@ -116,7 +133,7 @@ function showMessage(options) {
             console.log("autoCancelled message");
             modalLayer.clear().destroyChildren();
             modalLayer.draw();
-        }, 1500);
+        }, 1250);
     }
 
     modalLayer.add(messageGroup);
@@ -156,11 +173,14 @@ function makeButton(options) {
     })
     .on('click', function() {
         console.log("Clicked button");
+        modalLayer.clear().destroyChildren();
+        modalLayer.draw();
         options.action();
     });
     
     return button;
 }
+
 
 // Begin the game with a modal message:
 showMessage({
@@ -169,23 +189,33 @@ showMessage({
     button: {
         text: "Play!",
         action: function() {
-            modalLayer.clear().destroyChildren();
-            modalLayer.draw();
             menuLayer.draw();
             loadLevel(0);
             sounds.play('coin');
-            sounds.setMusic(true);
-            sounds.setTyping(true);
             play();
         }
     },
     autoCancel: false
 });
 
-// TODO:
 // Key inputs:
 // 1-7 generate coffees
 // QWER
 // ASDF
 // ZXCV deliver to the 12 desks
 // and P to pause/resume
+var input = {};
+
+document.onkeyup = function(e) {
+    input[e.key] = true;
+}
+
+function handleRecentKeyInputs() {
+    // Play/pause:
+    if (input['p']) {
+        if (GAME.loop) pause();
+        else play();
+    }
+    // Clear stored values:
+    input = {};
+}

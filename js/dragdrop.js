@@ -97,7 +97,7 @@ stage.on("dragend", function(e) {
 
 // Notify when a shape is dropped on (depends on previous definition)
 stage.on("drop", function(e) {
-    console.log('dropped sth on', e.target.attrs.name);
+    console.log('dropped sth on', e.target.name());
     performDrop(inDrag, e.target);
 });
 
@@ -108,12 +108,11 @@ function performDrop(draggable, droppable) {
     var parentObj;
     if (draggable.hasName('coffee')) parentObj = GAME.activeCoffee;
     else if (draggable.hasName('treat')) parentObj = GAME.activeTreat;
-    console.log("Parent Obj", parentObj);
 
     if (droppable.hasName('coder')) {
         // Regex match the Konva.Image namelist against coders' first names:
         var coder = coders.filter(c => droppable.attrs.name.match(c.fname))[0];
-        console.log(parentObj.name, "dropped on", coder.name);
+        console.log(parentObj.name, "dropped on", coder.fname);
 
         if (draggable.hasName('coffee')) {
             coder.addCoffee(GAME.activeCoffee);
