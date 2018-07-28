@@ -55,8 +55,11 @@ class Treat {
         .on('mouseout', function() {
             document.body.style.cursor = 'pointer';
         })
-        .on('dragstart', function() {
+        .on('dragstart', function(e) {
             // co-handled elsewhere
+            this.moveTo(tempLayer);
+            inDrag = this;
+            console.log('TempLayering ' + this.name());
             coffeeLayer.draw();
         });
         coffeeLayer.add(this.treatObj);
@@ -166,11 +169,16 @@ class Coffee {
             .on('dragstart', function() {
                 // co-handled elsewhere
                 GAME.activeCoffee = me;
+                this.moveTo(tempLayer);
+                inDrag = this;
+                console.log('TempLayering ' + this.name());
                 coffeeLayer.draw();
-            })
+            });
+            /*
             .on('dragend', function() {
                 // handled elsewhere
             });
+            */
         }
     }
 

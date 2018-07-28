@@ -292,3 +292,50 @@ musicCredit
     sounds.setMusic(sounds.music.paused);   // play if paused; pause if playing
 });
 menuLayer.add(musicCredit);
+
+
+// Extinguisher bonus:
+var fireExt = new Konva.Rect({
+    x: 380,
+    y: 70,
+    width: 8,
+    height: 20,
+    fill: 'blue',
+    opacity: 0.3
+});
+bgLayer.add(fireExt);
+fireExt
+.on('mouseover', function() {
+    document.body.style.cursor = 'pointer';
+})
+.on('mouseout', function() {
+    document.body.style.cursor = 'default';
+})
+.on('click', function() {
+    // Remove click region:
+    fireExt.destroy();
+    // Create foam:
+    var foam = new Konva.Group();
+    bgLayer.add(foam);
+    for (var f = 0; f < 100; f++) {
+        foam.add(new Konva.Circle({
+            x: 350 + f * Math.random(),
+            y: 60 + f * Math.random(),
+            radius: 15 + 10 * Math.random(),
+            fill: 'white',
+            opacity: 0.3,
+        }));
+        bgLayer.draw();
+    }
+    // Fade foam:
+    new Konva.Tween({
+        node: foam,
+        opacity: 0,
+        duration: 5,
+        easing: Konva.Easings.EaseInOut
+    }).play();
+    
+    // Easter egg reward:
+    GAME.timeLeft += 10;
+});
+

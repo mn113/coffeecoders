@@ -144,17 +144,18 @@ class Coder {
         fgLayer.add(this.nameLabel);
     }
     
-    // Add a speech bubble comprised of a Label, Tag & Text (run once):
+    // Add a speech bubble comprised of Label > Tag, Text, Image (run once):
     createBubble() {
-        // create label
         this.bubble = new Konva.Label({
             x: this.pos.x + 12,
             y: this.pos.y,
             visible: false
         });
         
-        // add a tag to the label
+        // Add a tag (the speech bubble itself) to the label:
         this.bubble.add(new Konva.Tag({
+            width: 20,
+            height: 20,
             fill: '#eee',
             stroke: '#333',
             strokeWidth: 1,
@@ -169,19 +170,40 @@ class Coder {
             cornerRadius: 3
         }));
         
-        // add text to the label
+        // Add text to the label (for Treat emoji):
         this.bubble.add(new Konva.Text({
             text: '',
-            fontSize: 10,
+            fontSize: 12,
             padding: 2
+        }));
+
+        // Add image placeholder (for Coffee icon):
+        this.bubble.add(new Konva.Image({
+            image: null,
+            x: 4,
+            y: -10,
+            width: 18,
+            height: 18
         }));
     
         fgLayer.add(this.bubble);
     }
 
     // Change the text content of the speech bubble:
-    updateBubble(content) {
-        this.bubble.getChildren(node => node.className == 'Text')[0].text(content);
+    updateBubble(item) {
+        if (item.icon) {
+            // Treat: show Text and hide Image
+            this.bubble.getChildren()[1].text(item.icon);
+            this.bubble.getChildren()[2].hide();
+        }
+        else {
+            // Coffee: show Image and hide Text
+            var imgObj = new Image();
+            imgObj.src = item.img;
+            this.bubble.getChildren()[1].text("    ");
+            this.bubble.getChildren()[2].image(imgObj).show();
+        }
+        this.bubble.show();
     }
 
     // Render a bar graph of the caffeine level (run once):
@@ -235,7 +257,7 @@ class Coder {
     wantCoffee() {
         var coffee = coffees[this.coffeePreference];
         this.craving = coffee;
-        this.updateBubble('☕');
+        this.updateBubble(coffee);
         this.bubble.show();
         fgLayer.draw();
         console.log(`${this.fname} wants a ${coffee.name}`);
@@ -244,7 +266,7 @@ class Coder {
     wantSugar() {
         var treat = treats.random();
         this.craving = treat;
-        this.updateBubble(treat.icon);
+        this.updateBubble(treat);
         this.bubble.show();
         fgLayer.draw();
         console.log(`${this.fname} wants a ${treat.name}`);
@@ -260,26 +282,46 @@ class Coder {
         console.info('Add', coffee);
         sounds.play('slurp');
 
+        this.bubble.hide();
+
         GAME.caffeineConsumed += coffee.strength * 50;  // based on 50mg of caffeine in single espresso shot
-        this.caffeine += coffee.strength / 4;
+
+        // Affect coder stats (more if preference matched):
+        if (coffee.index === this.coffeePreference) {
+            this.caffeine += coffee.strength / 4;
+            this.tolerance += 0.03;
+            this.falloff -= 0.03;    
+        }
+        else {
+            this.caffeine += coffee.strength / 6;
+            this.tolerance += 0.02;
+            this.falloff -= 0.02;    
+        }
         this.caffeine = Math.min(1, this.caffeine);
-        this.tolerance += 0.03;
-        this.falloff -= 0.03;
-        // TODO: render cup on desk?
+
         this.toDrink = coffee.strength;
+        // Drink it then reset craving:
         setTimeout(() => {
             this.craving = null;
         }, 1000 * coffee.strength);
+
+        // Change preference:
+        this.coffeePreference = Math.floor(Math.random() * 7);  // index of coffees
     }
 
     addSugar(treat) {
         console.info('Sugar', treat);
         sounds.play('sugar');
+
+        this.bubble.hide();
+
+        // Benefits:
+        this.writeCode();
+        this.fixBug();
         if (treat.name == this.craving.name) {
             // Stats boost
-            this.tolerance += 0.2;
-            this.falloff -= 0.2;
-            this.fixBug();
+            this.tolerance += 0.25;
+            this.falloff -= 0.25;
         }
         this.craving = null;
     }
@@ -288,7 +330,7 @@ class Coder {
     highlight() {
         this.konvaImg.cache();
         this.konvaImg.filters([Konva.Filters.Brighten]);
-        this.konvaImg.brightness(0.15);
+        this.konvaImg.brightness(0.125);
         fgLayer.draw();
     }
 
@@ -314,14 +356,14 @@ class Coder {
         // Use up available coffee:
         this.toDrink -= 0.2;    // sips 1/5 of an Espresso per tick
         this.toDrink = Math.max(0, this.toDrink);
-        this.caffeine -= 0.02 * this.falloff; // make geometric?
+        this.caffeine -= 0.005 * this.falloff;
         this.caffeine = Math.max(0.1, this.caffeine);
         this.updateCaffBar(this.caffeine);
 
         // Initialise new food/drink craving?
         if (!this.craving) {
-            if (this.toDrink <= 0 && Math.random() > 0.9) this.wantCoffee();
-            else if (Math.random() > 0.9) this.wantSugar();
+            if (this.toDrink <= 0 && this.caffeine < 0.333 && Math.random() > 0.9) this.wantCoffee();
+            else if (Math.random() > 0.975) this.wantSugar();
         }
     }
 }

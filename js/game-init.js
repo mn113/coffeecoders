@@ -20,7 +20,7 @@ function play() {
             else {
                 showMessage({
                     heading: `Level ${GAME.level + 1} passed!`,
-                    subtext: 'A new coder joins the team...',
+                    subtext: '😎 A new coder joins the team...',
                     autoCancel: true
                 });
                 sounds.play('levelup');
@@ -47,7 +47,7 @@ function gameOver(result) {
     if (result == 'lost') {
         showMessage({
             heading: "Game Over",
-            subtext: `The project was NOT delivered on time.\n\n${GAME.caffeineConsumed}mg of caffeine were consumed.`,
+            subtext: `The project was NOT delivered on time. 🤬\n\n${GAME.caffeineConsumed}mg of caffeine were consumed.`,
             button: {
                 text: "Retry",
                 action: function() {
@@ -60,7 +60,7 @@ function gameOver(result) {
     }
     else if (result == 'won') {
         showMessage({
-            heading: "🍩 Hurrah! 🥐",
+            heading: "👍 Hurrah! 👏",
             subtext: `The project was completed on time and can be shipped! (You beat the game!)\n\n${GAME.caffeineConsumed}mg of caffeine were consumed.\n\nBest of luck in your next endeavour.`,
             autoCancel: false
         });
@@ -103,7 +103,8 @@ function showMessage(options) {
         y: 140,
         width: 220,
         align: 'center',
-        fontSize: 12,
+        fontSize: 11,
+        lineHeight: 1.2,
         text: options.subtext
     });
     messageGroup.add(bg, h1, p);
@@ -125,7 +126,7 @@ function showMessage(options) {
 function makeButton(options) {
     var button = new Konva.Label({
         x: 210,
-        y: 180
+        y: 190
     });
     var tag = new Konva.Tag({
         width: 60,
