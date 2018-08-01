@@ -1,0 +1,28 @@
+{
+  "name": "coffeecoders",
+  "version": "1.0.0",
+  "description": "Browser game about coffee",
+  "main": "index.html",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mn113/coffeecoders.git"
+  },
+  "author": "M. Nicholson",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/mn113/coffeecoders/issues"
+  },
+  "homepage": "https://github.com/mn113/coffeecoders#readme"
+}
